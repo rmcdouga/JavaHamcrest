@@ -19,6 +19,7 @@ tasks.register("showVersion") {
 subprojects {
     apply plugin: 'checkstyle'
     apply plugin: 'java-library'
+	apply plugin: "eclipse"
 
     group = rootProject.group
     version = rootProject.version
