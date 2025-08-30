@@ -14,6 +14,7 @@ import java.beans.PropertyDescriptor;
  * @since 1.1.0
  * @deprecated Replaced by {@link PropertyAccessor}
  */
+@Deprecated
 public class PropertyUtil {
 
     private PropertyUtil() {

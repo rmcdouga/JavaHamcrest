@@ -165,6 +165,7 @@ public final class PathMatchers {
      * @param expected the expected path
      * @return the file matcher
      */
+    @Deprecated
     public static Matcher<Path> hasCanonicalPathString(final Matcher<String> expected) {
         return hasRealPathString(expected);	// 
     }
