@@ -143,7 +143,7 @@ public class IsIterableContainingParallelRuns<E> extends TypeSafeDiagnosingMatch
   public static <E> Matcher<Iterable<E>> containsParallelRunsOf(
       final int numRuns, final Matcher<? super E>... matchers
   ) {
-    return containsParallelRunsOf(numRuns, asList(matchers));
+    return containsParallelRunsOf(numRuns, List.<Matcher<? super E>>of(matchers));
   }
 
   public static <E> Matcher<Iterable<E>> containsParallelRunsOf(
