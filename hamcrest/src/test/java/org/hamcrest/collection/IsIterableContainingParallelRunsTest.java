@@ -5,9 +5,10 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.collection.IsIterableContainingParallelRuns.containsParallelRunsOf;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.hamcrest.test.MatcherAssertions.*;
 
 import java.util.List;
-import org.hamcrest.AbstractMatcherTest;
+import org.hamcrest.test.AbstractMatcherTest;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 
