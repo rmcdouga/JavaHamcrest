@@ -1,6 +1,9 @@
 package org.hamcrest.collection;
 
-import org.hamcrest.AbstractMatcherTest;
+import static org.hamcrest.test.MatcherAssertions.*;
+
+import org.hamcrest.test.AbstractMatcherTest;
+import org.junit.jupiter.api.Test;
 import org.hamcrest.Matcher;
 
 import java.util.*;
@@ -37,10 +40,12 @@ public class IsUnmodifiableCollectionTest extends AbstractMatcherTest {
         return isUnmodifiable();
     }
 
+    @Test
     public void testMatchesUnmodifiableList() {
         assertMatches("truly unmodifiable list", isUnmodifiable(), Collections.unmodifiableList(Collections.emptyList()));
     }
 
+    @Test
     public void testMatchesUnmodifiableCustomList() {
         class CustomUnmodifiableList<E> implements List<E> {
 
@@ -168,26 +173,32 @@ public class IsUnmodifiableCollectionTest extends AbstractMatcherTest {
         assertMatches("truly unmodifiable list", isUnmodifiable(), new CustomUnmodifiableList<>(Arrays.asList(1, 2, 3)));
     }
 
+    @Test
     public void testMatchesUnmodifiableSet() {
         assertMatches("truly unmodifiable set", isUnmodifiable(), Collections.unmodifiableSet(Collections.emptySet()));
     }
 
+    @Test
     public void testMatchesUnmodifiableCollection() {
         assertMatches("truly unmodifiable collection", isUnmodifiable(), Collections.unmodifiableCollection(Arrays.asList(1, 2, 3)));
     }
 
+    @Test
     public void testMismatchesArrayList() {
         assertMismatchDescription("was able to add a value into the list by index", isUnmodifiable(), new ArrayList<>());
     }
 
+    @Test
     public void testMismatchesArraysList() {
         assertMismatchDescription("java.util.Arrays$ArrayList is a known modifiable collection", isUnmodifiable(), Arrays.asList(1, 2, 3));
     }
 
+    @Test
     public void testMismatchesHashSet() {
         assertMismatchDescription("was able to add a value into the collection", isUnmodifiable(), new HashSet<>());
     }
 
+    @Test
     public void testMismatches() {
         for (String[] errorCondition : ERROR_CONDITIONS) {
             String[] unsupportedMethods = new String[errorCondition.length - 1];

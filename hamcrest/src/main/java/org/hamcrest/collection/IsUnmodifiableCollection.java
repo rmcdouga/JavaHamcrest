@@ -13,24 +13,27 @@ import java.util.*;
  */
 public class IsUnmodifiableCollection<E> extends TypeSafeDiagnosingMatcher<Collection<? extends E>> {
 
-    private static final Map<Class, Object> DEFAULT_COLLECTIONS = new HashMap<>();
-    private static final Set<String> KNOWN_UNMODIFIABLE_COLLECTIONS = new HashSet<>();
-    private static final Set<String> KNOWN_MODIFIABLE_COLLECTIONS = new HashSet<>();
+    private static final Map<Class<? extends Collection>, Object> DEFAULT_COLLECTIONS = new HashMap<>();
+    private static final Set<String> KNOWN_UNMODIFIABLE_COLLECTIONS = Set.of("java.util.ImmutableCollections", "java.util.Collections$Unmodifiable");
+    private static final Set<String> KNOWN_MODIFIABLE_COLLECTIONS = Set.of("java.util.Arrays$ArrayList");
 
     static {
         final List<String> list = Arrays.asList("a", "b", "c");
         DEFAULT_COLLECTIONS.put(Collection.class, list);
         DEFAULT_COLLECTIONS.put(List.class, list);
         DEFAULT_COLLECTIONS.put(Set.class, new HashSet<>(list));
-
-        KNOWN_UNMODIFIABLE_COLLECTIONS.add("java.util.ImmutableCollections");
-        KNOWN_UNMODIFIABLE_COLLECTIONS.add("java.util.Collections$Unmodifiable");
-
-        KNOWN_MODIFIABLE_COLLECTIONS.add("java.util.Arrays$ArrayList");
     }
 
     /**
-     * Creates matcher that matches when collection is truly unmodifiable
+     * Creates matcher that matches when collection is truly unmodifiable.
+     * 
+     * Under some circumstances the matcher will attempt to modify the collection to verify that it is unmodifiable.
+     * In that case, the test will fail however subsequent tests that happen after the failure will be 
+     * operating on the modified collection.  This may be important if multiple tests are executed using
+     * JUnit's assertAll() or similar functionality.
+     * 
+     * @param <E> the type of elements in the collection
+     * @return The matcher
      */
     public static <E> Matcher<Collection<? extends E>> isUnmodifiable() {
         return new IsUnmodifiableCollection<>();
