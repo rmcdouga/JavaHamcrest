@@ -4,6 +4,8 @@ import static org.hamcrest.test.MatcherAssertions.*;
 
 import org.hamcrest.test.AbstractMatcherTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.FieldSource;
 import org.hamcrest.Matcher;
 
 import java.util.*;
@@ -35,11 +37,29 @@ public class IsUnmodifiableCollectionTest extends AbstractMatcherTest {
             new String[]{null, SET_INT_INDEX_E_ELEMENT, ADD_INT_INDEX_E_ELEMENT, ADD_ALL_INT_INDEX_COLLECTION_EXTENDS_E_C, REMOVE_INT_INDEX, ADD_E_E, ADD_ALL_COLLECTION_EXTENDS_E_C, REMOVE_OBJECT_O, REMOVE_ALL_COLLECTION_C, RETAIN_ALL_COLLECTION_C, CLEAR}
     );
 
+    // TODO: Should I include Map.of().values()?
+	private static final List<Collection<?>> JDK_KNOWN_UNMODIFIABLE_COLLECTIONS = List.of(Set.of(), List.of());
+	private static final List<Collection<?>> JDK_KNOWN_MODIFIABLE_COLLECTIONS = List.of(
+			new ArrayList(), new LinkedList(), new HashSet(), new LinkedHashSet(), new TreeSet(), new PriorityQueue(), new ArrayDeque());
+    
     @Override
     protected Matcher<?> createMatcher() {
         return isUnmodifiable();
     }
 
+    @ParameterizedTest
+    @FieldSource("JDK_KNOWN_UNMODIFIABLE_COLLECTIONS")
+    public void testMatchesKnownJdkUnmodifiableCollections(Collection<?> collection) {
+        assertMatches("truly unmodifiable JDK Collection", isUnmodifiable(), collection);
+    }
+    
+    @ParameterizedTest
+    @FieldSource("JDK_KNOWN_MODIFIABLE_COLLECTIONS")
+    public void testMismatchesKnownJdkModifiableCollections(Collection<?> collection) {
+        assertDoesNotMatch("modifiable JDK Collection", isUnmodifiable(), collection);
+    }
+    
+    
     @Test
     public void testMatchesUnmodifiableList() {
         assertMatches("truly unmodifiable list", isUnmodifiable(), Collections.unmodifiableList(Collections.emptyList()));
