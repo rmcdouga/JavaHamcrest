@@ -32,7 +32,8 @@ public class PathMatchersTest extends AbstractMatcherTest {
         Files.createFile(file);
         Files.createFile(directory.resolve("mydirFile")); // Makes sure myDir is not empty.
         if (!OS.WINDOWS.isCurrentOs()) { // Can't do symbolic links on Windows unless admin privileges are available.
-            Files.createSymbolicLink(tempDir.resolve("mySymbolicLink"), file);
+            symbolicLink = tempDir.resolve("mySymbolicLink");
+            Files.createSymbolicLink(symbolicLink, file);
         }
     }
 
@@ -130,7 +131,7 @@ public class PathMatchersTest extends AbstractMatcherTest {
         assertMatches("matches file size", PathMatchers.hasSizeEqualTo(0L), file);
         assertDoesNotMatch("doesn't match incorrect file size", PathMatchers.hasSizeEqualTo(34L), file);
 
-        assertMatches("matches file size", PathMatchers.hasSizeEqualTo(0L), directory);
+        assertMatches("matches file size", PathMatchers.hasSizeEqualTo(OS.WINDOWS.isCurrentOs() ? 0L : 4096L), directory);
         assertDoesNotMatch("doesn't match incorrect file size", PathMatchers.hasSizeEqualTo(34L), directory);
     }
 
