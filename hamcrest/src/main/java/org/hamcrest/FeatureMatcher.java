@@ -69,20 +69,19 @@ private FeatureMatcher(Matcher<? super U> subMatcher, String featureDescription,
                .appendDescriptionOf(subMatcher);
   }
 
-	/**
-	 * Create a matcher that matches a feature of an object.
-	 *
-	 * @param expected              the matcher for the expected feature value
-	 * @param extractor             function to extract the feature from the object
-	 * @param featureDescription    descriptive text to use in describeTo
-	 * @param featureName           identifying text for mismatch message
-	 * @param expectedType 			expected type to match against
-	 * @return a matcher that matches the feature of the object
-	 */
-  public static <T,F> Matcher<T> matcher(final Matcher<F> expected, final Function<T, F> extractor, String featureDescription, String featureName, Class<T> expectedType) {
+  /**
+   * Create a matcher that matches a feature of an object.
+   *
+   * @param expected           the matcher for the expected feature value
+   * @param extractor          function to extract the feature from the object
+   * @param featureDescription descriptive text to use in describeTo
+   * @param featureName        identifying text for mismatch message
+   * @param expectedType       expected type to match against
+   * @return a matcher that matches the feature of the object
+   */
+  public static <T, F> Matcher<T> matcher(final Matcher<F> expected, final Function<T, F> extractor, String featureDescription, String featureName, Class<T> expectedType) {
       return new FeatureMatcher<T, F>(expected, featureDescription, featureName, expectedType) {
           @Override protected F featureValueOf(T actual) { return extractor.apply(actual); }
       };
   }
-
 }

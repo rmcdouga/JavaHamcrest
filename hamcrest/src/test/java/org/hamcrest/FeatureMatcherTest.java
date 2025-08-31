@@ -9,8 +9,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public final class FeatureMatcherTest {
 
     private final FeatureMatcher<Thingy, String> resultMatcher = resultMatcher();
-	private final Matcher<Thingy> resultMatcherStaticCtr = 
-			FeatureMatcher.matcher(new Match("bar"), t->t.getResult(), "Thingy with result", "result", Thingy.class);
+    private final Matcher<Thingy> resultMatcherStaticCtr = 
+            FeatureMatcher.matcher(new Match("bar"), t->t.getResult(), "Thingy with result", "result", Thingy.class);
 
     @Test public void
     matchesPartOfAnObject() {

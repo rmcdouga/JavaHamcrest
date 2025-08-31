@@ -14,7 +14,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 public class OptionalMatchersTest {
-	private static final String LS = System.lineSeparator();
+    private static final String LS = System.lineSeparator();
 
     @Test
     public void checkEmptyOptional() {

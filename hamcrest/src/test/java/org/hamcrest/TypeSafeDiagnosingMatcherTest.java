@@ -19,9 +19,9 @@ public class TypeSafeDiagnosingMatcherTest {
 
     @Test public void
     describesMismatches_staticConstructor() {
-    	Matcher<String> stringMatcher = 
-    			TypeSafeDiagnosingMatcher.matcher(item->false,"matches","mismatching",String.class);        
-    	assertMismatchDescription("was null", STRING_MATCHER, null);
+        Matcher<String> stringMatcher = 
+                TypeSafeDiagnosingMatcher.matcher(item->false,"matches","mismatching",String.class);        
+        assertMismatchDescription("was null", STRING_MATCHER, null);
         assertMismatchDescription("was Character \"c\"", STRING_MATCHER, 'c');
         assertMismatchDescription("mismatching", STRING_MATCHER, "other");
     }
@@ -44,7 +44,7 @@ public class TypeSafeDiagnosingMatcherTest {
     @Test public void
     detects_non_builtin_types_static_constructor() {
         final Matcher<NotBuiltIn> matcher = 
-        		TypeSafeDiagnosingMatcher.matcher(item->true,"a builtin","a not builtin",NotBuiltIn.class);        
+                TypeSafeDiagnosingMatcher.matcher(item->true,"a builtin","a not builtin",NotBuiltIn.class);        
 
       assertMatches("not built in", matcher, new NotBuiltIn());
       assertDoesNotMatch("other not built in", (Matcher)matcher, new OtherNotBuiltIn());
@@ -87,20 +87,26 @@ public class TypeSafeDiagnosingMatcherTest {
 
 
     public static class SubMatcher<T> extends TypeSafeDiagnosingMatcher<T> {
-      public SubMatcher() {
-          super();
-      }
-      public SubMatcher(T expectedObject) {
-          super(expectedObject.getClass());
-      }
-      @Override protected boolean matchesSafely(T item, Description mismatchDescription) { return true; }
-      @Override public void describeTo(Description description) { description.appendText("sub type"); }
-      
-      static <T> Matcher<T> matcher(T expectedObject) {
-    	  return new SubMatcher<T>(expectedObject) {
-    		  
-    	  };
-      }
+        public SubMatcher() {
+        }
+
+        public SubMatcher(T expectedObject) {
+            super(expectedObject.getClass());
+        }
+
+        @Override
+        protected boolean matchesSafely(T item, Description mismatchDescription) {
+            return true;
+        }
+
+        @Override
+        public void describeTo(Description description) {
+            description.appendText("sub type");
+        }
+
+        static <T> Matcher<T> matcher(T expectedObject) {
+            return new SubMatcher<T>(expectedObject) {};
+        }
     }
 
     public static class NotBuiltIn {

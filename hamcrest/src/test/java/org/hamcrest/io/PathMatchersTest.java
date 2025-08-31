@@ -3,19 +3,15 @@ package org.hamcrest.io;
 import org.hamcrest.test.AbstractMatcherTest;
 import org.hamcrest.Matcher;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
-import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
-import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.DosFileAttributes;
 
 import static org.hamcrest.test.MatcherAssertions.*;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -24,20 +20,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class PathMatchersTest extends AbstractMatcherTest {
 
-	@TempDir Path tempDir;
+    @TempDir Path tempDir;
     private Path directory;
     private Path file;
     private Path symbolicLink;
 
     @BeforeEach
     protected void setUp() throws IOException {
-		directory = Files.createDirectory(tempDir.resolve("myDir"));
+        directory = Files.createDirectory(tempDir.resolve("myDir"));
         file = directory.resolve("myFile");
         Files.createFile(file);
         Files.createFile(directory.resolve("mydirFile")); // Makes sure myDir is not empty.
-		if (!OS.WINDOWS.isCurrentOs()) {	// Can't do symbolic links on Windows unless admin privileges are available.
-			Files.createSymbolicLink(tempDir.resolve("mySymbolicLink"), file);
-		}
+        if (!OS.WINDOWS.isCurrentOs()) { // Can't do symbolic links on Windows unless admin privileges are available.
+            Files.createSymbolicLink(tempDir.resolve("mySymbolicLink"), file);
+        }
     }
 
     @Test
@@ -77,51 +73,51 @@ public class PathMatchersTest extends AbstractMatcherTest {
 
         assertTrue(file.toFile().setWritable(false), "set writable off " + file);
         assertDoesNotMatch("doesn't match unwritable file", PathMatchers.isWritable(), file);
-        
+
         assertMatches("matches writable directory", PathMatchers.isWritable(), directory);
 
         // Directories cannot be set to read-only on Windows.
-		if (!OS.WINDOWS.isCurrentOs()) {
-	        assertTrue(directory.toFile().setWritable(false), "set writable off " + file);
-	        assertDoesNotMatch("doesn't match unwritable file", PathMatchers.isWritable(), directory);
-		}
+        if (!OS.WINDOWS.isCurrentOs()) {
+            assertTrue(directory.toFile().setWritable(false), "set writable off " + file);
+            assertDoesNotMatch("doesn't match unwritable file", PathMatchers.isWritable(), directory);
+        }
     }
 
     @Test
     public void testIsHidden() throws Exception {
-    	Path hiddenFile = tempDir.resolve(Paths.get(".hidden_file"));
-    	Path hiddenDir = tempDir.resolve(Paths.get(".hidden_dir"));
-		Files.createFile(hiddenFile);
-		Files.createDirectory(hiddenDir);
-		
-		// Set the hidden attribute for the file and directory on Windows.
-		if (OS.WINDOWS.isCurrentOs()) {
-			Files.setAttribute(hiddenFile, "dos:hidden", true);
-			Files.setAttribute(hiddenDir, "dos:hidden", true);
-		}
+        Path hiddenFile = tempDir.resolve(Paths.get(".hidden_file"));
+        Path hiddenDir = tempDir.resolve(Paths.get(".hidden_dir"));
+        Files.createFile(hiddenFile);
+        Files.createDirectory(hiddenDir);
 
-		assertMatches("matches hidden file", PathMatchers.isHidden(), tempDir.resolve(hiddenFile));
-		assertMatches("matches hidden directory", PathMatchers.isHidden(), hiddenDir);
+        // Set the hidden attribute for the file and directory on Windows.
+        if (OS.WINDOWS.isCurrentOs()) {
+            Files.setAttribute(hiddenFile, "dos:hidden", true);
+            Files.setAttribute(hiddenDir, "dos:hidden", true);
+        }
 
-		assertDoesNotMatch("doesn't match unhidden (i.e. visible) file", PathMatchers.isHidden(), file);
-		assertDoesNotMatch("doesn't match unhidden (i.e. visible) directory", PathMatchers.isHidden(), directory);
+        assertMatches("matches hidden file", PathMatchers.isHidden(), tempDir.resolve(hiddenFile));
+        assertMatches("matches hidden directory", PathMatchers.isHidden(), hiddenDir);
+
+        assertDoesNotMatch("doesn't match unhidden (i.e. visible) file", PathMatchers.isHidden(), file);
+        assertDoesNotMatch("doesn't match unhidden (i.e. visible) directory", PathMatchers.isHidden(), directory);
     }
 
     @Test
     public void testIsSameFile() {
-    	// TODO: Needs work
+        // TODO: Needs work
         assertMatches("matches same file", PathMatchers.isSameFile(file.toAbsolutePath()), file);
         assertDoesNotMatch("doesn't match different file", PathMatchers.isSameFile(file), directory);
-        assertMismatchDescription("'" + directory.toString() + "' is not the same file or directory", PathMatchers.isSameFile(file), directory);
-		if (!OS.WINDOWS.isCurrentOs()) { // Windows does not support symbolic links without administrator privileges.
-			assertMatches("matches same file through symbolic link", PathMatchers.isSameFile(file),
-					symbolicLink);
-			assertDoesNotMatch("doesn't match different file through symbolic link", PathMatchers.isSameFile(directory),
-					symbolicLink);
-		}
+        assertMismatchDescription("'" + directory.toString() + "' is not the same file or directory",
+                PathMatchers.isSameFile(file), directory);
+        if (!OS.WINDOWS.isCurrentOs()) { // Windows does not support symbolic links without administrator privileges.
+            assertMatches("matches same file through symbolic link", PathMatchers.isSameFile(file), symbolicLink);
+            assertDoesNotMatch("doesn't match different file through symbolic link", PathMatchers.isSameFile(directory), symbolicLink);
+        }
     }
 
-    @DisabledOnOs(OS.WINDOWS)	// Windows does not support creating symbolic links without administrator privileges.
+    @DisabledOnOs(OS.WINDOWS) // Windows does not support creating symbolic links without administrator
+                              // privileges.
     @Test
     public void testisSymbolicLink() {
         assertMatches("matches synbolic link", PathMatchers.isSymbolicLink(), symbolicLink);
@@ -133,7 +129,7 @@ public class PathMatchersTest extends AbstractMatcherTest {
     public void testHasSizeEqualToLong() {
         assertMatches("matches file size", PathMatchers.hasSizeEqualTo(0L), file);
         assertDoesNotMatch("doesn't match incorrect file size", PathMatchers.hasSizeEqualTo(34L), file);
- 
+
         assertMatches("matches file size", PathMatchers.hasSizeEqualTo(0L), directory);
         assertDoesNotMatch("doesn't match incorrect file size", PathMatchers.hasSizeEqualTo(34L), directory);
     }
@@ -170,33 +166,35 @@ public class PathMatchersTest extends AbstractMatcherTest {
 
     @Test
     public void testHasCanonicalPathString() throws Exception {
-        assertMatches("matches file canonical path", PathMatchers.hasCanonicalPathString(equalTo(file.toRealPath().toString())), file);
+        assertMatches("matches file canonical path", PathMatchers.hasCanonicalPathString(equalTo(file.toRealPath().toString())),
+                file);
         assertDoesNotMatch("doesn't match incorrect canonical path", PathMatchers.hasCanonicalPathString(equalTo("foo")), file);
     }
 
     @Test
     public void testHasAbsolutePath() {
         assertMatches("matches file absolute path", PathMatchers.hasAbsolutePath(equalTo(file.toAbsolutePath())), file);
-        assertDoesNotMatch("doesn't match incorrect absolute path", PathMatchers.hasAbsolutePath(equalTo(Paths.get("foo"))), file);
+        assertDoesNotMatch("doesn't match incorrect absolute path", PathMatchers.hasAbsolutePath(equalTo(Paths.get("foo"))),
+                file);
     }
 
     @Test
     public void testHasAbsolutePathString() {
-        assertMatches("matches file absolute path", PathMatchers.hasAbsolutePathString(equalTo(file.toAbsolutePath().toString())), file);
+        assertMatches("matches file absolute path", PathMatchers.hasAbsolutePathString(equalTo(file.toAbsolutePath().toString())),
+                file);
         assertDoesNotMatch("doesn't match incorrect absolute path", PathMatchers.hasAbsolutePathString(equalTo("foo")), file);
     }
 
     @Test
     public void testHasFileSystem() {
-		assertMatches("matches file system", PathMatchers.hasFileSystem(equalTo(file.getFileSystem())), file);
-		// TODO:  Maybe use JimFS to create a different FileSystem for this test?
-//		assertDoesNotMatch("doesn't match incorrect file system",PathMatchers.hasFileSystem(equalTo(Paths.get("foo").getFileSystem())), file);
+        assertMatches("matches file system", PathMatchers.hasFileSystem(equalTo(file.getFileSystem())), file);
+        // TODO: Maybe use JimFS to create a different FileSystem for this test?
+//      assertDoesNotMatch("doesn't match incorrect file system",PathMatchers.hasFileSystem(equalTo(Paths.get("foo").getFileSystem())), file);
     }
-    
+
     @Override
     protected Matcher<?> createMatcher() {
         return PathMatchers.hasSizeEqualTo(1L);
 //        return PathMatchers.isSymbolicLink();
     }
-
 }

@@ -38,9 +38,9 @@ public class IsUnmodifiableCollectionTest extends AbstractMatcherTest {
     );
 
     // TODO: Should I include Map.of().values()?
-	private static final List<Collection<?>> JDK_KNOWN_UNMODIFIABLE_COLLECTIONS = List.of(Set.of(), List.of());
-	private static final List<Collection<?>> JDK_KNOWN_MODIFIABLE_COLLECTIONS = List.of(
-			new ArrayList(), new LinkedList(), new HashSet(), new LinkedHashSet(), new TreeSet(), new PriorityQueue(), new ArrayDeque());
+    private static final List<Collection<?>> JDK_KNOWN_UNMODIFIABLE_COLLECTIONS = List.of(Set.of(), List.of());
+    private static final List<Collection<?>> JDK_KNOWN_MODIFIABLE_COLLECTIONS = List.of(
+            new ArrayList(), new LinkedList(), new HashSet(), new LinkedHashSet(), new TreeSet(), new PriorityQueue(), new ArrayDeque());
     
     @Override
     protected Matcher<?> createMatcher() {

@@ -108,7 +108,7 @@ public final class PathMatchers {
      * @return the file matcher
      */
     public static Matcher<Path> hasSize(final Matcher<Long> expected) {
-    	return FeatureMatcher.matcher(expected, p->toUncheckedEx(()->Files.size(p)), "A file with size", "size", Path.class);
+        return FeatureMatcher.matcher(expected, p -> toUncheckedEx(() -> Files.size(p)), "A file with size", "size", Path.class);
 //        return new FeatureMatcher<Path, Long>(expected, "A file with size", "size") {
 //            @Override protected Long featureValueOf(Path actual) { return toUncheckedEx(()->Files.size(actual)); }
 //        };
@@ -160,6 +160,7 @@ public final class PathMatchers {
 
     /**
      * A matcher that checks if a file canonical path matches an expected path.
+     * 
      * @deprecated Use {@link #hasRealPath(Matcher)} instead. Provided for backward compatibility with FileMatchers.
      * 
      * @param expected the expected path
@@ -167,11 +168,12 @@ public final class PathMatchers {
      */
     @Deprecated
     public static Matcher<Path> hasCanonicalPathString(final Matcher<String> expected) {
-        return hasRealPathString(expected);	// 
+        return hasRealPathString(expected); //
     }
 
     /**
      * A matcher that checks if a file absolute path matches an expected path.
+     * 
      * @param expected the expected path
      * @return the file matcher
      */
@@ -180,8 +182,10 @@ public final class PathMatchers {
             @Override protected Path featureValueOf(Path actual) { return actual.toAbsolutePath(); }
         };
     }
+
     /**
      * A matcher that checks if a file absolute path matches an expected path.
+     * 
      * @param expected the expected path
      * @return the file matcher
      */
@@ -191,18 +195,18 @@ public final class PathMatchers {
         };
     }
 
-	/**
+    /**
      * A matcher that checks if a file's FileSystem matches an expected FileSystem.
-	 * @param expected
-	 * @return
-	 */
-	public static Matcher<Path> hasFileSystem(final Matcher<FileSystem> expected) {
-		return new FeatureMatcher<Path, FileSystem>(expected, "A file with file system", "file system") {
-			@Override protected java.nio.file.FileSystem featureValueOf(Path actual) { return actual.getFileSystem(); }
-		};
-	}
-	
-	
+     * 
+     * @param expected
+     * @return
+     */
+    public static Matcher<Path> hasFileSystem(final Matcher<FileSystem> expected) {
+        return new FeatureMatcher<Path, FileSystem>(expected, "A file with file system", "file system") {
+            @Override protected java.nio.file.FileSystem featureValueOf(Path actual) { return actual.getFileSystem(); }
+        };
+    }
+
     // Possible additions:
     // - hasParent(Matcher<Path>)
     // - hasRoot(Matcher<Path>)
@@ -210,40 +214,41 @@ public final class PathMatchers {
     // - hasLastModifiedTime(Matcher<Instant>)
     // - hasOwner(Matcher<UserPrincipal>)
     // - hasPosixPermissions(Matcher<Set<PosixFilePermission>>)
-    
+
     // - hasCreationTime(Matcher<Instant>)
     // - hasGroup(Matcher<GroupPrincipal>)
     // - hasFileKey(Matcher<FileKey>)
     // - hasFileAttribute(String, Matcher<Object>)
     // - hasProvider(Matcher<FileSystemProvider>)
-    
+
     // - hasContent(Matcher<String>)
     // - containsStrings(String...)
-    
-    // Workaround for JDK 8 not supporting Files.isHidden(Path) for directories (JDK-8215467).  Fixed in Java 13.
-	private static boolean isHidden(Path path) throws IOException {
-		if (path.getFileSystem().provider().getClass().getName().contains("WindowsFileSystemProvider")) {
-			// WindowsFileSystemProvider does not support isHidden(Path) for directories
-			return Files.readAttributes(path, "dos:hidden", java.nio.file.LinkOption.NOFOLLOW_LINKS)
-					.get("hidden").equals(Boolean.TRUE);
-		} else {
-			return Files.isHidden(path);
-		}
+
+    // Workaround for JDK 8 not supporting Files.isHidden(Path) for directories
+    // (JDK-8215467). Fixed in Java 13.
+    private static boolean isHidden(Path path) throws IOException {
+        if (path.getFileSystem().provider().getClass().getName().contains("WindowsFileSystemProvider")) {
+            // WindowsFileSystemProvider does not support isHidden(Path) for directories
+            return Files.readAttributes(path, "dos:hidden", java.nio.file.LinkOption.NOFOLLOW_LINKS).get("hidden")
+                    .equals(Boolean.TRUE);
+        } else {
+            return Files.isHidden(path);
+        }
     }
-    
+
     @FunctionalInterface
     private interface Predicate_WithExceptions<T, E extends Exception> {
         boolean test(T t) throws E;
     }
-    
-	private static <T, E extends IOException> Predicate<T> toUncheckedEx(Predicate_WithExceptions<T, E> predicate) {
-		return value -> {
-			try {
-				return predicate.test(value);
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
-			}
-		};
+
+    private static <T, E extends IOException> Predicate<T> toUncheckedEx(Predicate_WithExceptions<T, E> predicate) {
+        return value -> {
+            try {
+                return predicate.test(value);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        };
     }
 
     @FunctionalInterface
@@ -251,11 +256,11 @@ public final class PathMatchers {
         T get() throws E;
     }
 
-	private static <T> T toUncheckedEx(Supplier_WithExceptions<T, ?> supplier) {
-		try {
-			return supplier.get();
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+    private static <T> T toUncheckedEx(Supplier_WithExceptions<T, ?> supplier) {
+        try {
+            return supplier.get();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 }
