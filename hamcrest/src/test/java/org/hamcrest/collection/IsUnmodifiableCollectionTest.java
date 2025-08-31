@@ -38,7 +38,11 @@ public class IsUnmodifiableCollectionTest extends AbstractMatcherTest {
     );
 
     // TODO: Should I include Map.of().values()?
-    private static final List<Collection<?>> JDK_KNOWN_UNMODIFIABLE_COLLECTIONS = List.of(Set.of(), List.of());
+    private static final List<Collection<?>> JDK_KNOWN_UNMODIFIABLE_COLLECTIONS = List.of(
+            Set.of(), List.of(), 
+            Collections.emptyList(), Collections.emptySet(), Collections.emptySortedSet(), 
+            Collections.unmodifiableList(new ArrayList<>()), Collections.unmodifiableSet(new HashSet<>())
+            );
     private static final List<Collection<?>> JDK_KNOWN_MODIFIABLE_COLLECTIONS = List.of(
             new ArrayList(), new LinkedList(), new HashSet(), new LinkedHashSet(), new TreeSet(), new PriorityQueue(), new ArrayDeque());
     
@@ -50,7 +54,7 @@ public class IsUnmodifiableCollectionTest extends AbstractMatcherTest {
     @ParameterizedTest
     @FieldSource("JDK_KNOWN_UNMODIFIABLE_COLLECTIONS")
     public void testMatchesKnownJdkUnmodifiableCollections(Collection<?> collection) {
-        assertMatches("truly unmodifiable JDK Collection", isUnmodifiable(), collection);
+        assertMatches("truly unmodifiable JDK Collection (" + collection.getClass().getName() + ")", isUnmodifiable(), collection);
     }
     
     @ParameterizedTest

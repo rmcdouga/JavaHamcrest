@@ -14,7 +14,7 @@ import java.util.*;
 public class IsUnmodifiableCollection<E> extends TypeSafeDiagnosingMatcher<Collection<? extends E>> {
 
     private static final Map<Class<? extends Collection>, Object> DEFAULT_COLLECTIONS = new HashMap<>();
-    private static final Set<String> KNOWN_UNMODIFIABLE_COLLECTIONS = Set.of("java.util.ImmutableCollections", "java.util.Collections$Unmodifiable");
+    private static final Set<String> KNOWN_UNMODIFIABLE_COLLECTIONS = Set.of("java.util.ImmutableCollections", "java.util.Collections$Unmodifiable", "java.util.Collections$Empty");
     private static final Set<String> KNOWN_MODIFIABLE_COLLECTIONS = Set.of("java.util.Arrays$ArrayList");
 
     static {
