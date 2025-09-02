@@ -2,15 +2,18 @@ package org.hamcrest.collection;
 
 import static org.hamcrest.test.MatcherAssertions.*;
 
+import static org.hamcrest.collection.IsUnmodifiableCollection.isUnmodifiable;
+
 import org.hamcrest.test.AbstractMatcherTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.FieldSource;
 import org.hamcrest.Matcher;
 
 import java.util.*;
+import java.util.stream.Stream;
 
-import static org.hamcrest.collection.IsUnmodifiableCollection.isUnmodifiable;
 
 public class IsUnmodifiableCollectionTest extends AbstractMatcherTest {
 
@@ -38,28 +41,36 @@ public class IsUnmodifiableCollectionTest extends AbstractMatcherTest {
     );
 
     // TODO: Should I include Map.of().values()?
-    private static final List<Collection<?>> JDK_KNOWN_UNMODIFIABLE_COLLECTIONS = List.of(
+    @SuppressWarnings("unused")
+    private static final List<Arguments> JDK_KNOWN_UNMODIFIABLE_COLLECTIONS = Stream.<Collection<?>>of(
             Set.of(), List.of(), 
             Collections.emptyList(), Collections.emptySet(), Collections.emptySortedSet(), 
             Collections.unmodifiableList(new ArrayList<>()), Collections.unmodifiableSet(new HashSet<>())
-            );
-    private static final List<Collection<?>> JDK_KNOWN_MODIFIABLE_COLLECTIONS = List.of(
-            new ArrayList(), new LinkedList(), new HashSet(), new LinkedHashSet(), new TreeSet(), new PriorityQueue(), new ArrayDeque());
+            )
+            .map(c->Arguments.of(c, c.getClass().getName()))
+            .toList();
+    @SuppressWarnings("unused")
+    private static final List<Arguments> JDK_KNOWN_MODIFIABLE_COLLECTIONS = Stream.<Collection<?>>of(
+            new ArrayList(), new LinkedList(), new HashSet(), new LinkedHashSet(), new TreeSet(), new PriorityQueue(), new ArrayDeque()
+            )
+            .map(c->Arguments.of(c, c.getClass().getName()))
+            .toList();
+    
     
     @Override
     protected Matcher<?> createMatcher() {
         return isUnmodifiable();
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{1}")
     @FieldSource("JDK_KNOWN_UNMODIFIABLE_COLLECTIONS")
-    public void testMatchesKnownJdkUnmodifiableCollections(Collection<?> collection) {
+    public void testMatchesKnownJdkUnmodifiableCollections(Collection<?> collection, String className) {
         assertMatches("truly unmodifiable JDK Collection (" + collection.getClass().getName() + ")", isUnmodifiable(), collection);
     }
     
-    @ParameterizedTest
+    @ParameterizedTest(name = "{1}")
     @FieldSource("JDK_KNOWN_MODIFIABLE_COLLECTIONS")
-    public void testMismatchesKnownJdkModifiableCollections(Collection<?> collection) {
+    public void testMismatchesKnownJdkModifiableCollections(Collection<?> collection, String className) {
         assertDoesNotMatch("modifiable JDK Collection", isUnmodifiable(), collection);
     }
     
@@ -227,7 +238,7 @@ public class IsUnmodifiableCollectionTest extends AbstractMatcherTest {
         for (String[] errorCondition : ERROR_CONDITIONS) {
             String[] unsupportedMethods = new String[errorCondition.length - 1];
             System.arraycopy(errorCondition, 1, unsupportedMethods, 0, unsupportedMethods.length);
-            ArrayListWrapper<Integer> arrayListWrapper = new ArrayListWrapper<>(Arrays.asList(1, 2, 3), unsupportedMethods);
+            ArrayListWrapper<Integer> arrayListWrapper = new ArrayListWrapper<>(List.of(1, 2, 3), unsupportedMethods);
             String error = errorCondition[0];
             if (error != null) {
                 assertMismatchDescription(
