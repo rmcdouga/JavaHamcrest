@@ -2,7 +2,7 @@ package org.hamcrest.collection;
 
 import static org.hamcrest.test.MatcherAssertions.*;
 
-import static org.hamcrest.collection.IsUnmodifiableCollection.*;
+import static org.hamcrest.collection.IsUnmodifiable.*;
 
 import org.hamcrest.test.AbstractMatcherTest;
 import org.junit.jupiter.api.Test;
@@ -16,7 +16,7 @@ import java.util.*;
 import java.util.stream.Stream;
 
 
-public class IsUnmodifiableCollectionTest extends AbstractMatcherTest {
+public class IsUnmodifiableTest extends AbstractMatcherTest {
 
     private static final String SET_INT_INDEX_E_ELEMENT = "set(int index, E element)";
     private static final String ADD_E_E = "add(E e)";
@@ -67,24 +67,24 @@ public class IsUnmodifiableCollectionTest extends AbstractMatcherTest {
     
     @Override
     protected Matcher<?> createMatcher() {
-        return isUnmodifiable();
+        return isUnmodifiableCollection();
     }
 
     @ParameterizedTest(name = "{1}")
     @FieldSource("JDK_KNOWN_UNMODIFIABLE_COLLECTIONS")
     public void testIsUnmodifiableMatchesKnownJdkUnmodifiableCollections(Collection<?> collection, String className) {
-        assertMatches("truly unmodifiable JDK Collection (" + className + ")", isUnmodifiable(), collection);
+        assertMatches("truly unmodifiable JDK Collection (" + className + ")", isUnmodifiableCollection(), collection);
     }
 
     @ParameterizedTest(name = "{1}")
     @FieldSource("JDK_KNOWN_MODIFIABLE_COLLECTIONS")
     public void testIsUnmodifiableMismatchesKnownJdkModifiableCollections(Collection<?> collection, String className) {
-        assertMismatchDescription(className + " is a known modifiable JDK collection", isUnmodifiable(), collection);
+        assertMismatchDescription(className + " is a known modifiable JDK collection", isUnmodifiableCollection(), collection);
     }
     
     @Test
     public void testIsUnmodifiableMatchesUnmodifiableCustomList() {
-         assertMatches("truly unmodifiable list", isUnmodifiable(), new CustomUnmodifiableList<>(Arrays.asList(1, 2, 3)));
+         assertMatches("truly unmodifiable list", isUnmodifiableCollection(), new CustomUnmodifiableList<>(Arrays.asList(1, 2, 3)));
     }
 
     @ParameterizedTest
@@ -94,11 +94,11 @@ public class IsUnmodifiableCollectionTest extends AbstractMatcherTest {
         if (errorCondition.errorMsg != null) {
             assertMismatchDescription(
                     errorCondition.errorMsg,
-                    isUnmodifiable(),
+                    isUnmodifiableCollection(),
                     arrayListWrapper
             );
         } else {
-            assertMatches("truly unmodifiable collection", isUnmodifiable(), arrayListWrapper);
+            assertMatches("truly unmodifiable collection", isUnmodifiableCollection(), arrayListWrapper);
         }
     }
 

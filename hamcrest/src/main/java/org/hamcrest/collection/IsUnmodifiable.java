@@ -13,7 +13,7 @@ import java.util.*;
 /**
  * Matches if collection is truly unmodifiable
  */
-public class IsUnmodifiableCollection {
+public class IsUnmodifiable {
 
 
     /**
@@ -26,7 +26,7 @@ public class IsUnmodifiableCollection {
      * @param <E> the type of elements in the collection
      * @return The matcher
      */
-    public static <E> Matcher<Collection<? extends E>> isUnmodifiable() {
+    public static <E> Matcher<Collection<? extends E>> isUnmodifiableCollection() {
         return anyOf(isUnmodifiableJdkCollection(), allOf(not(isModifiableJdkCollection()), isUnmodifiableCustomCollection()));
     }
 
