@@ -2,7 +2,7 @@ package org.hamcrest.collection;
 
 import static org.hamcrest.test.MatcherAssertions.*;
 
-import static org.hamcrest.collection.IsUnmodifiableCollection.isUnmodifiable;
+import static org.hamcrest.collection.IsUnmodifiableCollection.*;
 
 import org.hamcrest.test.AbstractMatcherTest;
 import org.junit.jupiter.api.Test;
@@ -10,6 +10,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.FieldSource;
 import org.hamcrest.Matcher;
+import org.hamcrest.MatcherAssert;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -27,35 +28,42 @@ public class IsUnmodifiableCollectionTest extends AbstractMatcherTest {
     private static final String REMOVE_ALL_COLLECTION_C = "removeAll(Collection<?> c)";
     private static final String RETAIN_ALL_COLLECTION_C = "retainAll(Collection<?> c)";
     private static final String CLEAR = "clear()";
-    private static final List<String[]> ERROR_CONDITIONS = Arrays.asList(
-            new String[]{"was able to add element on the list iterator", SET_INT_INDEX_E_ELEMENT},
-            new String[]{"was able to perform addAll by index on the collection", SET_INT_INDEX_E_ELEMENT, ADD_INT_INDEX_E_ELEMENT},
-            new String[]{"was able to call remove by index from the collection", SET_INT_INDEX_E_ELEMENT, ADD_INT_INDEX_E_ELEMENT, ADD_ALL_INT_INDEX_COLLECTION_EXTENDS_E_C},
-            new String[]{"was able to add a value into the collection", SET_INT_INDEX_E_ELEMENT, ADD_INT_INDEX_E_ELEMENT, ADD_ALL_INT_INDEX_COLLECTION_EXTENDS_E_C, REMOVE_INT_INDEX},
-            new String[]{"was able to perform addAll on the collection", SET_INT_INDEX_E_ELEMENT, ADD_INT_INDEX_E_ELEMENT, ADD_ALL_INT_INDEX_COLLECTION_EXTENDS_E_C, REMOVE_INT_INDEX, ADD_E_E},
-            new String[]{"was able to call remove a value from the collection", SET_INT_INDEX_E_ELEMENT, ADD_INT_INDEX_E_ELEMENT, ADD_ALL_INT_INDEX_COLLECTION_EXTENDS_E_C, REMOVE_INT_INDEX, ADD_E_E, ADD_ALL_COLLECTION_EXTENDS_E_C},
-            new String[]{"was able to call removeAll on the collection", SET_INT_INDEX_E_ELEMENT, ADD_INT_INDEX_E_ELEMENT, ADD_ALL_INT_INDEX_COLLECTION_EXTENDS_E_C, REMOVE_INT_INDEX, ADD_E_E, ADD_ALL_COLLECTION_EXTENDS_E_C, REMOVE_OBJECT_O},
-            new String[]{"was able to call retainAll on the collection", SET_INT_INDEX_E_ELEMENT, ADD_INT_INDEX_E_ELEMENT, ADD_ALL_INT_INDEX_COLLECTION_EXTENDS_E_C, REMOVE_INT_INDEX, ADD_E_E, ADD_ALL_COLLECTION_EXTENDS_E_C, REMOVE_OBJECT_O, REMOVE_ALL_COLLECTION_C},
-            new String[]{"was able to clear the collection", SET_INT_INDEX_E_ELEMENT, ADD_INT_INDEX_E_ELEMENT, ADD_ALL_INT_INDEX_COLLECTION_EXTENDS_E_C, REMOVE_INT_INDEX, ADD_E_E, ADD_ALL_COLLECTION_EXTENDS_E_C, REMOVE_OBJECT_O, REMOVE_ALL_COLLECTION_C, RETAIN_ALL_COLLECTION_C},
-            new String[]{null, SET_INT_INDEX_E_ELEMENT, ADD_INT_INDEX_E_ELEMENT, ADD_ALL_INT_INDEX_COLLECTION_EXTENDS_E_C, REMOVE_INT_INDEX, ADD_E_E, ADD_ALL_COLLECTION_EXTENDS_E_C, REMOVE_OBJECT_O, REMOVE_ALL_COLLECTION_C, RETAIN_ALL_COLLECTION_C, CLEAR}
+    private record ModificationErrorCondition(String errorMsg, Set<String> unsupportedMethods) {};
+    
+    @SuppressWarnings("unused")
+    private static final List<ModificationErrorCondition> ERROR_CONDITIONS = List.of(
+            new ModificationErrorCondition("was able to add element on the list iterator", Set.of(SET_INT_INDEX_E_ELEMENT)),
+            new ModificationErrorCondition("was able to perform addAll by index on the collection", Set.of(SET_INT_INDEX_E_ELEMENT, ADD_INT_INDEX_E_ELEMENT)),
+            new ModificationErrorCondition("was able to call remove by index from the collection", Set.of(SET_INT_INDEX_E_ELEMENT, ADD_INT_INDEX_E_ELEMENT, ADD_ALL_INT_INDEX_COLLECTION_EXTENDS_E_C)),
+            new ModificationErrorCondition("was able to add a value into the collection", Set.of(SET_INT_INDEX_E_ELEMENT, ADD_INT_INDEX_E_ELEMENT, ADD_ALL_INT_INDEX_COLLECTION_EXTENDS_E_C, REMOVE_INT_INDEX)),
+            new ModificationErrorCondition("was able to perform addAll on the collection", Set.of(SET_INT_INDEX_E_ELEMENT, ADD_INT_INDEX_E_ELEMENT, ADD_ALL_INT_INDEX_COLLECTION_EXTENDS_E_C, REMOVE_INT_INDEX, ADD_E_E)),
+            new ModificationErrorCondition("was able to call remove a value from the collection", Set.of(SET_INT_INDEX_E_ELEMENT, ADD_INT_INDEX_E_ELEMENT, ADD_ALL_INT_INDEX_COLLECTION_EXTENDS_E_C, REMOVE_INT_INDEX, ADD_E_E, ADD_ALL_COLLECTION_EXTENDS_E_C)),
+            new ModificationErrorCondition("was able to call removeAll on the collection", Set.of(SET_INT_INDEX_E_ELEMENT, ADD_INT_INDEX_E_ELEMENT, ADD_ALL_INT_INDEX_COLLECTION_EXTENDS_E_C, REMOVE_INT_INDEX, ADD_E_E, ADD_ALL_COLLECTION_EXTENDS_E_C, REMOVE_OBJECT_O)),
+            new ModificationErrorCondition("was able to call retainAll on the collection", Set.of(SET_INT_INDEX_E_ELEMENT, ADD_INT_INDEX_E_ELEMENT, ADD_ALL_INT_INDEX_COLLECTION_EXTENDS_E_C, REMOVE_INT_INDEX, ADD_E_E, ADD_ALL_COLLECTION_EXTENDS_E_C, REMOVE_OBJECT_O, REMOVE_ALL_COLLECTION_C)),
+            new ModificationErrorCondition("was able to clear the collection", Set.of(SET_INT_INDEX_E_ELEMENT, ADD_INT_INDEX_E_ELEMENT, ADD_ALL_INT_INDEX_COLLECTION_EXTENDS_E_C, REMOVE_INT_INDEX, ADD_E_E, ADD_ALL_COLLECTION_EXTENDS_E_C, REMOVE_OBJECT_O, REMOVE_ALL_COLLECTION_C, RETAIN_ALL_COLLECTION_C)),
+            new ModificationErrorCondition(null, Set.of(SET_INT_INDEX_E_ELEMENT, ADD_INT_INDEX_E_ELEMENT, ADD_ALL_INT_INDEX_COLLECTION_EXTENDS_E_C, REMOVE_INT_INDEX, ADD_E_E, ADD_ALL_COLLECTION_EXTENDS_E_C, REMOVE_OBJECT_O, REMOVE_ALL_COLLECTION_C, RETAIN_ALL_COLLECTION_C, CLEAR))
     );
 
     // TODO: Should I include Map.of().values()?
     @SuppressWarnings("unused")
     private static final List<Arguments> JDK_KNOWN_UNMODIFIABLE_COLLECTIONS = Stream.<Collection<?>>of(
+            // List of collections that we know are unmodifiable
             Set.of(), List.of(), 
             Collections.emptyList(), Collections.emptySet(), Collections.emptySortedSet(), 
-            Collections.unmodifiableList(new ArrayList<>()), Collections.unmodifiableSet(new HashSet<>())
+            Collections.unmodifiableCollection(new ArrayList<>()), Collections.unmodifiableList(new ArrayList<>()), Collections.unmodifiableSet(new HashSet<>())
             )
             .map(c->Arguments.of(c, c.getClass().getName()))
             .toList();
     @SuppressWarnings("unused")
     private static final List<Arguments> JDK_KNOWN_MODIFIABLE_COLLECTIONS = Stream.<Collection<?>>of(
-            new ArrayList(), new LinkedList(), new HashSet(), new LinkedHashSet(), new TreeSet(), new PriorityQueue(), new ArrayDeque()
+            // List of collections that we know are modifiable
+            new ArrayList(), new LinkedList(), new HashSet(), new LinkedHashSet(), new TreeSet(), new PriorityQueue(), new ArrayDeque(),
+            Arrays.asList(1, 2, 3)
             )
             .map(c->Arguments.of(c, c.getClass().getName()))
             .toList();
     
+    // isUnmodifiable() tests
     
     @Override
     protected Matcher<?> createMatcher() {
@@ -64,210 +72,114 @@ public class IsUnmodifiableCollectionTest extends AbstractMatcherTest {
 
     @ParameterizedTest(name = "{1}")
     @FieldSource("JDK_KNOWN_UNMODIFIABLE_COLLECTIONS")
-    public void testMatchesKnownJdkUnmodifiableCollections(Collection<?> collection, String className) {
-        assertMatches("truly unmodifiable JDK Collection (" + collection.getClass().getName() + ")", isUnmodifiable(), collection);
+    public void testIsUnmodifiableMatchesKnownJdkUnmodifiableCollections(Collection<?> collection, String className) {
+        assertMatches("truly unmodifiable JDK Collection (" + className + ")", isUnmodifiable(), collection);
+    }
+
+    @ParameterizedTest(name = "{1}")
+    @FieldSource("JDK_KNOWN_MODIFIABLE_COLLECTIONS")
+    public void testIsUnmodifiableMismatchesKnownJdkModifiableCollections(Collection<?> collection, String className) {
+        assertMismatchDescription(className + " is a known modifiable JDK collection", isUnmodifiable(), collection);
+    }
+    
+    @Test
+    public void testIsUnmodifiableMatchesUnmodifiableCustomList() {
+         assertMatches("truly unmodifiable list", isUnmodifiable(), new CustomUnmodifiableList<>(Arrays.asList(1, 2, 3)));
+    }
+
+    @ParameterizedTest
+    @FieldSource("ERROR_CONDITIONS")
+    public void testIsUnmodifiableMismatchesModifiableCustomList(ModificationErrorCondition errorCondition) {
+        CustomModifiableList<Integer> arrayListWrapper = new CustomModifiableList<>(List.of(1, 2, 3), errorCondition.unsupportedMethods);
+        if (errorCondition.errorMsg != null) {
+            assertMismatchDescription(
+                    errorCondition.errorMsg,
+                    isUnmodifiable(),
+                    arrayListWrapper
+            );
+        } else {
+            assertMatches("truly unmodifiable collection", isUnmodifiable(), arrayListWrapper);
+        }
+    }
+
+    // isUnmodifiableJdkCollection() tests
+
+    @ParameterizedTest(name = "{1}")
+    @FieldSource("JDK_KNOWN_UNMODIFIABLE_COLLECTIONS")
+    public void testIsUnmodifiableJdkCollectionMatchesKnownJdkUnmodifiableCollections(Collection<?> collection, String className) {
+        assertMatches("truly unmodifiable JDK Collection (" + className + ")", isUnmodifiableJdkCollection(), collection);
     }
     
     @ParameterizedTest(name = "{1}")
     @FieldSource("JDK_KNOWN_MODIFIABLE_COLLECTIONS")
-    public void testMismatchesKnownJdkModifiableCollections(Collection<?> collection, String className) {
-        assertDoesNotMatch("modifiable JDK Collection", isUnmodifiable(), collection);
+    public void testIsUnmodifiableJdkCollectionMismatchesKnownJdkModifiableCollections(Collection<?> collection, String className) {
+        assertMismatchDescription(className + " is not a known unmodifiable JDK collection", isUnmodifiableJdkCollection(), collection);
     }
     
+    @Test
+    public void testIsUnmodifiableJdkCollectionMismatchesUnmodifiableCustomList() {
+         CustomUnmodifiableList<Integer> testList = new CustomUnmodifiableList<>(Arrays.asList(1, 2, 3));
+         assertMismatchDescription(CustomUnmodifiableList.class.getName() + " is not a known unmodifiable JDK collection", isUnmodifiableJdkCollection(), testList);
+    }
+
+    // isModifiableJdkCollection() tests
+    
+    @ParameterizedTest(name = "{1}")
+    @FieldSource("JDK_KNOWN_UNMODIFIABLE_COLLECTIONS")
+    public void testIsModifiableJdkCollectionMatchesKnownJdkUnmodifiableCollections(Collection<?> collection, String className) {
+        assertMismatchDescription(className + " is not a known modifiable JDK collection", isModifiableJdkCollection(), collection);
+    }
+    
+    @ParameterizedTest(name = "{1}")
+    @FieldSource("JDK_KNOWN_MODIFIABLE_COLLECTIONS")
+    public void testIsModifiableJdkCollectionMatchesKnownJdkModifiableCollections(Collection<?> collection, String className) {
+        assertMatches("truly unmodifiable JDK Collection (" + className + ")", isModifiableJdkCollection(), collection);
+    }
     
     @Test
-    public void testMatchesUnmodifiableList() {
-        assertMatches("truly unmodifiable list", isUnmodifiable(), Collections.unmodifiableList(Collections.emptyList()));
+    public void testIsModifiableJdkCollectionMismatchesUnmodifiableCustomList() {
+         CustomUnmodifiableList<Integer> testList = new CustomUnmodifiableList<>(Arrays.asList(1, 2, 3));
+         assertMismatchDescription(CustomUnmodifiableList.class.getName() + " is not a known modifiable JDK collection", isModifiableJdkCollection(), testList);
     }
 
+    // isUnmodifiableCustomCollection() tests
     @Test
-    public void testMatchesUnmodifiableCustomList() {
-        class CustomUnmodifiableList<E> implements List<E> {
-
-            private List<E> list;
-
-            public CustomUnmodifiableList(List<E> list) {
-                this.list = Collections.unmodifiableList(list);
-            }
-
-            @Override
-            public int size() {
-                return list.size();
-            }
-
-            @Override
-            public boolean isEmpty() {
-                return list.isEmpty();
-            }
-
-            @Override
-            public boolean contains(Object o) {
-                return list.contains(o);
-            }
-
-            @Override
-            public Iterator<E> iterator() {
-                return list.iterator();
-            }
-
-            @Override
-            public Object[] toArray() {
-                return list.toArray();
-            }
-
-            @Override
-            public <T> T[] toArray(T[] a) {
-                return list.toArray(a);
-            }
-
-            @Override
-            public boolean add(E e) {
-                return list.add(e);
-            }
-
-            @Override
-            public boolean remove(Object o) {
-                return list.remove(o);
-            }
-
-            @Override
-            public boolean containsAll(Collection<?> c) {
-                return list.containsAll(c);
-            }
-
-            @Override
-            public boolean addAll(Collection<? extends E> c) {
-                return list.addAll(c);
-            }
-
-            @Override
-            public boolean addAll(int index, Collection<? extends E> c) {
-                return list.addAll(index, c);
-            }
-
-            @Override
-            public boolean removeAll(Collection<?> c) {
-                return list.removeAll(c);
-            }
-
-            @Override
-            public boolean retainAll(Collection<?> c) {
-                return list.retainAll(c);
-            }
-
-            @Override
-            public void clear() {
-                list.clear();
-            }
-
-            @Override
-            public E get(int index) {
-                return list.get(index);
-            }
-
-            @Override
-            public E set(int index, E element) {
-                return list.set(index, element);
-            }
-
-            @Override
-            public void add(int index, E element) {
-                list.add(index, element);
-            }
-
-            @Override
-            public E remove(int index) {
-                return list.remove(index);
-            }
-
-            @Override
-            public int indexOf(Object o) {
-                return list.indexOf(o);
-            }
-
-            @Override
-            public int lastIndexOf(Object o) {
-                return list.lastIndexOf(o);
-            }
-
-            @Override
-            public ListIterator<E> listIterator() {
-                return list.listIterator();
-            }
-
-            @Override
-            public ListIterator<E> listIterator(int index) {
-                return list.listIterator(index);
-            }
-
-            @Override
-            public List<E> subList(int fromIndex, int toIndex) {
-                return list.subList(fromIndex, toIndex);
-            }
-        }
-        assertMatches("truly unmodifiable list", isUnmodifiable(), new CustomUnmodifiableList<>(Arrays.asList(1, 2, 3)));
+    public void testisUnmodifiableCustomCollectionMatchesUnmodifiableCustomList() {
+         assertMatches("truly unmodifiable list", isUnmodifiableCustomCollection(), new CustomUnmodifiableList<>(Arrays.asList(1, 2, 3)));
     }
 
-    @Test
-    public void testMatchesUnmodifiableSet() {
-        assertMatches("truly unmodifiable set", isUnmodifiable(), Collections.unmodifiableSet(Collections.emptySet()));
-    }
-
-    @Test
-    public void testMatchesUnmodifiableCollection() {
-        assertMatches("truly unmodifiable collection", isUnmodifiable(), Collections.unmodifiableCollection(Arrays.asList(1, 2, 3)));
-    }
-
-    @Test
-    public void testMismatchesArrayList() {
-        assertMismatchDescription("was able to add a value into the list by index", isUnmodifiable(), new ArrayList<>());
-    }
-
-    @Test
-    public void testMismatchesArraysList() {
-        assertMismatchDescription("java.util.Arrays$ArrayList is a known modifiable collection", isUnmodifiable(), Arrays.asList(1, 2, 3));
-    }
-
-    @Test
-    public void testMismatchesHashSet() {
-        assertMismatchDescription("was able to add a value into the collection", isUnmodifiable(), new HashSet<>());
-    }
-
-    @Test
-    public void testMismatches() {
-        for (String[] errorCondition : ERROR_CONDITIONS) {
-            String[] unsupportedMethods = new String[errorCondition.length - 1];
-            System.arraycopy(errorCondition, 1, unsupportedMethods, 0, unsupportedMethods.length);
-            ArrayListWrapper<Integer> arrayListWrapper = new ArrayListWrapper<>(List.of(1, 2, 3), unsupportedMethods);
-            String error = errorCondition[0];
-            if (error != null) {
-                assertMismatchDescription(
-                        error,
-                        isUnmodifiable(),
-                        arrayListWrapper
-                );
-            } else {
-                assertMatches("truly unmodifiable collection", isUnmodifiable(), arrayListWrapper);
-            }
+    @ParameterizedTest
+    @FieldSource("ERROR_CONDITIONS")
+    public void testIsUnmodifiableCustomCollectionMismatchesModifiableCustomList(ModificationErrorCondition errorCondition) {
+        CustomModifiableList<Integer> arrayListWrapper = new CustomModifiableList<>(List.of(1, 2, 3), errorCondition.unsupportedMethods);
+        if (errorCondition.errorMsg != null) {
+            assertMismatchDescription(
+                    errorCondition.errorMsg,
+                    isUnmodifiableCustomCollection(),
+                    arrayListWrapper
+            );
+        } else {
+            assertMatches("truly unmodifiable collection", isUnmodifiableCustomCollection(), arrayListWrapper);
         }
     }
 
-    static class ArrayListWrapper<E> extends ArrayList<E> {
+    @SuppressWarnings("serial")
+    static class CustomModifiableList<E> extends ArrayList<E> {
         private final Set<String> unsupportedMethods;
 
         @SuppressWarnings("unused") // Used by reflection
-        public ArrayListWrapper(Collection<? extends E> c) {
+        public CustomModifiableList(Collection<? extends E> c) {
             super(c);
-            if (c instanceof ArrayListWrapper) {
-                this.unsupportedMethods = new HashSet<>(((ArrayListWrapper<E>) c).unsupportedMethods);
+            if (c instanceof CustomModifiableList) {
+                this.unsupportedMethods = new HashSet<>(((CustomModifiableList<E>) c).unsupportedMethods);
             } else {
                 throw new IllegalStateException();
             }
         }
 
-        public ArrayListWrapper(List<E> list, String... unsupportedMethods) {
+        public CustomModifiableList(List<E> list, Set<String> unsupportedMethods) {
             super(list);
-            this.unsupportedMethods = new HashSet<>(Arrays.asList(unsupportedMethods));
+            this.unsupportedMethods = unsupportedMethods;
         }
 
         @Override
@@ -332,4 +244,127 @@ public class IsUnmodifiableCollectionTest extends AbstractMatcherTest {
         }
     }
 
+    private static class CustomUnmodifiableList<E> implements List<E> {
+
+        private List<E> list;
+
+        public CustomUnmodifiableList(List<E> list) {
+            this.list = Collections.unmodifiableList(list);
+        }
+
+        @Override
+        public int size() {
+            return list.size();
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return list.isEmpty();
+        }
+
+        @Override
+        public boolean contains(Object o) {
+            return list.contains(o);
+        }
+
+        @Override
+        public Iterator<E> iterator() {
+            return list.iterator();
+        }
+
+        @Override
+        public Object[] toArray() {
+            return list.toArray();
+        }
+
+        @Override
+        public <T> T[] toArray(T[] a) {
+            return list.toArray(a);
+        }
+
+        @Override
+        public boolean add(E e) {
+            return list.add(e);
+        }
+
+        @Override
+        public boolean remove(Object o) {
+            return list.remove(o);
+        }
+
+        @Override
+        public boolean containsAll(Collection<?> c) {
+            return list.containsAll(c);
+        }
+
+        @Override
+        public boolean addAll(Collection<? extends E> c) {
+            return list.addAll(c);
+        }
+
+        @Override
+        public boolean addAll(int index, Collection<? extends E> c) {
+            return list.addAll(index, c);
+        }
+
+        @Override
+        public boolean removeAll(Collection<?> c) {
+            return list.removeAll(c);
+        }
+
+        @Override
+        public boolean retainAll(Collection<?> c) {
+            return list.retainAll(c);
+        }
+
+        @Override
+        public void clear() {
+            list.clear();
+        }
+
+        @Override
+        public E get(int index) {
+            return list.get(index);
+        }
+
+        @Override
+        public E set(int index, E element) {
+            return list.set(index, element);
+        }
+
+        @Override
+        public void add(int index, E element) {
+            list.add(index, element);
+        }
+
+        @Override
+        public E remove(int index) {
+            return list.remove(index);
+        }
+
+        @Override
+        public int indexOf(Object o) {
+            return list.indexOf(o);
+        }
+
+        @Override
+        public int lastIndexOf(Object o) {
+            return list.lastIndexOf(o);
+        }
+
+        @Override
+        public ListIterator<E> listIterator() {
+            return list.listIterator();
+        }
+
+        @Override
+        public ListIterator<E> listIterator(int index) {
+            return list.listIterator(index);
+        }
+
+        @Override
+        public List<E> subList(int fromIndex, int toIndex) {
+            return list.subList(fromIndex, toIndex);
+        }
+    }
 }

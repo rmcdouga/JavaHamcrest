@@ -44,11 +44,15 @@ public class IsUnmodifiableCollection {
     }
 
     private static class IsUnmodifiableJdkCollection<E> extends TypeSafeDiagnosingMatcher<Collection<? extends E>> {
-        private static final Set<String> KNOWN_UNMODIFIABLE_COLLECTIONS = Set.of("java.util.ImmutableCollections", "java.util.Collections$Unmodifiable", "java.util.Collections$Empty");
+        private static final Set<String> KNOWN_UNMODIFIABLE_COLLECTIONS = 
+                Set.of("java.util.ImmutableCollections", 
+                       "java.util.Collections$Unmodifiable", 
+                       "java.util.Collections$Empty"
+                       );
   
         @Override
         public void describeTo(Description description) {
-            description.appendText("Expected to be unmodifiable JDK collection, but ");
+            description.appendText("unmodifiable JDK collection");
         }
 
         @Override
@@ -61,15 +65,25 @@ public class IsUnmodifiableCollection {
                     return true;
                 }
             }
+            mismatchDescription.appendText(collectionClassName + " is not a known unmodifiable JDK collection");
             return false;
         }
     }
 
     private static class IsModifiableJdkCollection<E> extends TypeSafeDiagnosingMatcher<Collection<? extends E>> {
-        private static final Set<String> KNOWN_MODIFIABLE_COLLECTIONS = Set.of("java.util.Arrays$ArrayList");
+        private static final Set<String> KNOWN_MODIFIABLE_COLLECTIONS = 
+                Set.of("java.util.Arrays$ArrayList",
+                        "java.util.ArrayList",
+                        "java.util.LinkedList",
+                        "java.util.HashSet",
+                        "java.util.LinkedHashSet",
+                        "java.util.TreeSet",
+                        "java.util.PriorityQueue",
+                        "java.util.ArrayDeque"
+                        );
         @Override
         public void describeTo(Description description) {
-            description.appendText("Expected to be unmodifiable JDK collection, but ");
+            description.appendText("modifiable JDK collection");
         }
        
         @Override
@@ -79,10 +93,10 @@ public class IsUnmodifiableCollection {
             String collectionClassName = collectionClass.getName();
             for (String knownModifiableCollection : KNOWN_MODIFIABLE_COLLECTIONS) {
                 if (collectionClassName.startsWith(knownModifiableCollection)) {
-                    mismatchDescription.appendText(collectionClassName + " is a known modifiable collection");
                     return true;
                 }
             }
+            mismatchDescription.appendText(collectionClassName + " is not a known modifiable JDK collection");
             return false;
         }
     }
@@ -447,7 +461,7 @@ public class IsUnmodifiableCollection {
     
         @Override
         public void describeTo(Description description) {
-            description.appendText("Expected to be unmodifiable collection, but ");
+            description.appendText("unmodifiable collection");
         }
     }
 }
