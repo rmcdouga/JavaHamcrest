@@ -17,12 +17,11 @@ public class IsUnmodifiableCollection {
 
 
     /**
-     * Creates matcher that matches when collection is truly unmodifiable.
+     * Creates matcher that matches when collection is unmodifiable.
      * 
-     * Under some circumstances the matcher will attempt to modify the collection to verify that it is unmodifiable.
-     * In that case, the test will fail however subsequent tests that happen after the failure will be 
-     * operating on the modified collection.  This may be important if multiple tests are executed using
-     * JUnit's assertAll() or similar functionality.
+     * It looks for any of the known modifiable or unmodifiable JDK collections, if not found it tries to instantiate
+     * the collection and call all modification methods to see if any of them succeed.  This instantiation can fail if
+     * the collection does not have a constructor that can be called with default values.
      * 
      * @param <E> the type of elements in the collection
      * @return The matcher
@@ -31,14 +30,34 @@ public class IsUnmodifiableCollection {
         return anyOf(isUnmodifiableJdkCollection(), allOf(not(isModifiableJdkCollection()), isUnmodifiableCustomCollection()));
     }
 
+    /**
+     * Creates a matcher that matches when the collection is one of the known unmodifiable JDK collections.
+     * 
+     * @param <E> the type of elements in the collection
+     * @return The matcher
+     */
     public static <E> Matcher<Collection<? extends E>> isUnmodifiableJdkCollection() {
         return new IsUnmodifiableJdkCollection<>();
     }
 
+    /**
+     * Creates a matcher that matches when the collection is one of the known modifiable JDK collections.
+     * 
+     * @param <E> the type of elements in the collection
+     * @return The matcher
+     */
     public static <E> Matcher<Collection<? extends E>> isModifiableJdkCollection() {
         return new IsModifiableJdkCollection<>();
     }
 
+    /**
+     * Creates a matcher that matches when the collection is unmodifiable by calling all modification methods to see if
+     * any of them succeed. This instantiation can fail if the collection does not have a constructor that can be called
+     * with default values.
+     * 
+     * @param <E> the type of elements in the collection
+     * @return The matcher
+     */
     public static <E> Matcher<Collection<? extends E>> isUnmodifiableCustomCollection() {
         return new IsUnmodifiableCustomCollection<>();
     }
