@@ -27,7 +27,7 @@ public class IsUnmodifiable {
      * @return The matcher
      */
     public static <E> Matcher<Collection<? extends E>> isUnmodifiableCollection() {
-        return anyOf(isUnmodifiableJdkCollection(), allOf(not(isModifiableJdkCollection()), isUnmodifiableCustomCollection()));
+        return new IsUnmodifiableCollection<>();
     }
 
     /**
@@ -62,6 +62,47 @@ public class IsUnmodifiable {
         return new IsUnmodifiableCustomCollection<>();
     }
 
+    private static class IsUnmodifiableCollection<E> extends TypeSafeDiagnosingMatcher<Collection<? extends E>> {
+        private final Matcher<Collection<? extends E>> isUnmodifiableJdkCollection;
+        private final Matcher<Collection<? extends E>> isModifiableJdkCollection;
+        private final Matcher<Collection<? extends E>> isUnmodifiableCustomCollection;
+        
+        private IsUnmodifiableCollection() {
+            this(IsUnmodifiable.isUnmodifiableJdkCollection(), IsUnmodifiable.isModifiableJdkCollection(), IsUnmodifiable.isUnmodifiableCustomCollection());
+        }
+        
+        private IsUnmodifiableCollection(Matcher<Collection<? extends E>> isUnmodifiableJdkCollection,
+                                        Matcher<Collection<? extends E>> isModifiableJdkCollection,
+                                        Matcher<Collection<? extends E>> isUnmodifiableCustomCollection) {
+            this.isUnmodifiableJdkCollection = isUnmodifiableJdkCollection;
+            this.isModifiableJdkCollection = isModifiableJdkCollection;
+            this.isUnmodifiableCustomCollection = isUnmodifiableCustomCollection;
+        }
+
+        @Override
+        public void describeTo(Description description) {
+            description.appendText("unmodifiable collection");
+        }
+
+        @Override
+        protected boolean matchesSafely(Collection<? extends E> collection, Description mismatchDescription) {
+            if (isUnmodifiableJdkCollection.matches(collection)) {
+                return true;    // It's a known unmodifiable collection, so shortcut the remaining tests
+            }
+            if (isModifiableJdkCollection.matches(collection)) {
+                // If it's a known modifiable collection, then fail
+                mismatchDescription.appendText(collection.getClass().getName() + " is a known modifiable JDK collection");
+               return false;
+            }
+            if (!isUnmodifiableCustomCollection.matches(collection)) {
+                // If we are able to modify the collection, then fail
+                isUnmodifiableCustomCollection.describeMismatch(collection, mismatchDescription);
+                return false;
+            }
+            return true;
+        }
+    }
+    
     private static class IsUnmodifiableJdkCollection<E> extends TypeSafeDiagnosingMatcher<Collection<? extends E>> {
         private static final Set<String> KNOWN_UNMODIFIABLE_COLLECTIONS = 
                 Set.of("java.util.ImmutableCollections", 

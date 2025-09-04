@@ -5,6 +5,7 @@ import static org.hamcrest.test.MatcherAssertions.*;
 import static org.hamcrest.collection.IsUnmodifiable.*;
 
 import org.hamcrest.test.AbstractMatcherTest;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -70,23 +71,27 @@ public class IsUnmodifiableTest extends AbstractMatcherTest {
         return isUnmodifiableCollection();
     }
 
+    @DisplayName("IsUnmodifiableCollection() matches known unmodifiable JDK collections")
     @ParameterizedTest(name = "{1}")
     @FieldSource("JDK_KNOWN_UNMODIFIABLE_COLLECTIONS")
     public void testIsUnmodifiableMatchesKnownJdkUnmodifiableCollections(Collection<?> collection, String className) {
         assertMatches("truly unmodifiable JDK Collection (" + className + ")", isUnmodifiableCollection(), collection);
     }
 
+    @DisplayName("IsUnmodifiableCollection() mismatches known modifiable JDK collections")
     @ParameterizedTest(name = "{1}")
     @FieldSource("JDK_KNOWN_MODIFIABLE_COLLECTIONS")
     public void testIsUnmodifiableMismatchesKnownJdkModifiableCollections(Collection<?> collection, String className) {
         assertMismatchDescription(className + " is a known modifiable JDK collection", isUnmodifiableCollection(), collection);
     }
     
+    @DisplayName("IsUnmodifiableCollection() matches unmodifiable custom collection")
     @Test
     public void testIsUnmodifiableMatchesUnmodifiableCustomList() {
          assertMatches("truly unmodifiable list", isUnmodifiableCollection(), new CustomUnmodifiableList<>(Arrays.asList(1, 2, 3)));
     }
 
+    @DisplayName("IsUnmodifiableCollection() mismatches modifiable custom collection")
     @ParameterizedTest
     @FieldSource("ERROR_CONDITIONS")
     public void testIsUnmodifiableMismatchesModifiableCustomList(ModificationErrorCondition errorCondition) {
@@ -104,18 +109,21 @@ public class IsUnmodifiableTest extends AbstractMatcherTest {
 
     // isUnmodifiableJdkCollection() tests
 
+    @DisplayName("IsUnmodifiableJdkCollection() matches known unmodifiable JDK collections")
     @ParameterizedTest(name = "{1}")
     @FieldSource("JDK_KNOWN_UNMODIFIABLE_COLLECTIONS")
     public void testIsUnmodifiableJdkCollectionMatchesKnownJdkUnmodifiableCollections(Collection<?> collection, String className) {
         assertMatches("truly unmodifiable JDK Collection (" + className + ")", isUnmodifiableJdkCollection(), collection);
     }
     
+    @DisplayName("IsUnmodifiableJdkCollection() mismatches known modifiable JDK collections")
     @ParameterizedTest(name = "{1}")
     @FieldSource("JDK_KNOWN_MODIFIABLE_COLLECTIONS")
     public void testIsUnmodifiableJdkCollectionMismatchesKnownJdkModifiableCollections(Collection<?> collection, String className) {
         assertMismatchDescription(className + " is not a known unmodifiable JDK collection", isUnmodifiableJdkCollection(), collection);
     }
     
+    @DisplayName("IsUnmodifiableJdkCollection() mismatches unmodifiable custom collection")
     @Test
     public void testIsUnmodifiableJdkCollectionMismatchesUnmodifiableCustomList() {
          CustomUnmodifiableList<Integer> testList = new CustomUnmodifiableList<>(Arrays.asList(1, 2, 3));
@@ -124,30 +132,35 @@ public class IsUnmodifiableTest extends AbstractMatcherTest {
 
     // isModifiableJdkCollection() tests
     
+    @DisplayName("IsModifiableJdkCollection() mismatches known unmodifiable JDK collections")
     @ParameterizedTest(name = "{1}")
     @FieldSource("JDK_KNOWN_UNMODIFIABLE_COLLECTIONS")
     public void testIsModifiableJdkCollectionMatchesKnownJdkUnmodifiableCollections(Collection<?> collection, String className) {
         assertMismatchDescription(className + " is not a known modifiable JDK collection", isModifiableJdkCollection(), collection);
     }
     
+    @DisplayName("IsModifiableJdkCollection() matches known modifiable JDK collections")
     @ParameterizedTest(name = "{1}")
     @FieldSource("JDK_KNOWN_MODIFIABLE_COLLECTIONS")
     public void testIsModifiableJdkCollectionMatchesKnownJdkModifiableCollections(Collection<?> collection, String className) {
         assertMatches("truly unmodifiable JDK Collection (" + className + ")", isModifiableJdkCollection(), collection);
     }
     
+    @DisplayName("IsModifiableJdkCollection() mismatches modifiable custom collection")
     @Test
-    public void testIsModifiableJdkCollectionMismatchesUnmodifiableCustomList() {
-         CustomUnmodifiableList<Integer> testList = new CustomUnmodifiableList<>(Arrays.asList(1, 2, 3));
-         assertMismatchDescription(CustomUnmodifiableList.class.getName() + " is not a known modifiable JDK collection", isModifiableJdkCollection(), testList);
+    public void testIsModifiableJdkCollectionMismatchesModifiableCustomList() {
+         CustomModifiableList<Integer> testList = new CustomModifiableList<>(Arrays.asList(1, 2, 3), Set.of());
+         assertMismatchDescription(CustomModifiableList.class.getName() + " is not a known modifiable JDK collection", isModifiableJdkCollection(), testList);
     }
 
     // isUnmodifiableCustomCollection() tests
+    @DisplayName("IsUnmodifiableCustomCollection() matches unmodifiable custom collection")
     @Test
     public void testisUnmodifiableCustomCollectionMatchesUnmodifiableCustomList() {
          assertMatches("truly unmodifiable list", isUnmodifiableCustomCollection(), new CustomUnmodifiableList<>(Arrays.asList(1, 2, 3)));
     }
 
+    @DisplayName("IsUnmodifiableCustomCollection() mismatches modifiable custom collection")
     @ParameterizedTest
     @FieldSource("ERROR_CONDITIONS")
     public void testIsUnmodifiableCustomCollectionMismatchesModifiableCustomList(ModificationErrorCondition errorCondition) {
