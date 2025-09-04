@@ -25,7 +25,7 @@ public class IsUnmodifiable {
      * @return The matcher
      */
     public static <E> Matcher<Collection<? extends E>> isUnmodifiableCollection() {
-        return new IsUnmodifiableCollection<>();
+        return new IsUnmodifiableCollectionMatcher<>();
     }
 
     /**
@@ -35,7 +35,7 @@ public class IsUnmodifiable {
      * @return The matcher
      */
     public static <E> Matcher<Collection<? extends E>> isUnmodifiableJdkCollection() {
-        return new IsUnmodifiableJdkCollection<>();
+        return new IsUnmodifiableJdkCollectionMatcher<>();
     }
 
     /**
@@ -45,7 +45,7 @@ public class IsUnmodifiable {
      * @return The matcher
      */
     public static <E> Matcher<Collection<? extends E>> isModifiableJdkCollection() {
-        return new IsModifiableJdkCollection<>();
+        return new IsModifiableJdkCollectionMatcher<>();
     }
 
     /**
@@ -57,19 +57,19 @@ public class IsUnmodifiable {
      * @return The matcher
      */
     public static <E> Matcher<Collection<? extends E>> isUnmodifiableCustomCollection() {
-        return new IsUnmodifiableCustomCollection<>();
+        return new IsUnmodifiableCustomCollectionMatcher<>();
     }
 
-    private static class IsUnmodifiableCollection<E> extends TypeSafeDiagnosingMatcher<Collection<? extends E>> {
+    private static class IsUnmodifiableCollectionMatcher<E> extends TypeSafeDiagnosingMatcher<Collection<? extends E>> {
         private final Matcher<Collection<? extends E>> isUnmodifiableJdkCollection;
         private final Matcher<Collection<? extends E>> isModifiableJdkCollection;
         private final Matcher<Collection<? extends E>> isUnmodifiableCustomCollection;
         
-        private IsUnmodifiableCollection() {
+        private IsUnmodifiableCollectionMatcher() {
             this(IsUnmodifiable.isUnmodifiableJdkCollection(), IsUnmodifiable.isModifiableJdkCollection(), IsUnmodifiable.isUnmodifiableCustomCollection());
         }
         
-        private IsUnmodifiableCollection(Matcher<Collection<? extends E>> isUnmodifiableJdkCollection,
+        private IsUnmodifiableCollectionMatcher(Matcher<Collection<? extends E>> isUnmodifiableJdkCollection,
                                         Matcher<Collection<? extends E>> isModifiableJdkCollection,
                                         Matcher<Collection<? extends E>> isUnmodifiableCustomCollection) {
             this.isUnmodifiableJdkCollection = isUnmodifiableJdkCollection;
@@ -101,7 +101,7 @@ public class IsUnmodifiable {
         }
     }
     
-    private static class IsUnmodifiableJdkCollection<E> extends TypeSafeDiagnosingMatcher<Collection<? extends E>> {
+    private static class IsUnmodifiableJdkCollectionMatcher<E> extends TypeSafeDiagnosingMatcher<Collection<? extends E>> {
         private static final Set<String> KNOWN_UNMODIFIABLE_COLLECTIONS = 
                 Set.of("java.util.ImmutableCollections", 
                        "java.util.Collections$Unmodifiable", 
@@ -128,7 +128,7 @@ public class IsUnmodifiable {
         }
     }
 
-    private static class IsModifiableJdkCollection<E> extends TypeSafeDiagnosingMatcher<Collection<? extends E>> {
+    private static class IsModifiableJdkCollectionMatcher<E> extends TypeSafeDiagnosingMatcher<Collection<? extends E>> {
         private static final Set<String> KNOWN_MODIFIABLE_COLLECTIONS = 
                 Set.of("java.util.Arrays$ArrayList",
                         "java.util.ArrayList",
@@ -387,7 +387,7 @@ public class IsUnmodifiable {
         }
     }
     
-    private static class IsUnmodifiableCustomCollection<E> extends TypeSafeDiagnosingMatcher<Collection<? extends E>> {
+    private static class IsUnmodifiableCustomCollectionMatcher<E> extends TypeSafeDiagnosingMatcher<Collection<? extends E>> {
         @SuppressWarnings("rawtypes")
         private static final Map<Class<? extends Collection>, Object> DEFAULT_COLLECTIONS = new HashMap<>();
         static {
