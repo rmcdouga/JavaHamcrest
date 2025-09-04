@@ -1,7 +1,5 @@
 package org.hamcrest.collection;
 
-import static org.hamcrest.Matchers.*;
-
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
@@ -181,10 +179,10 @@ public class IsUnmodifiable {
         protected static final Object TEST_OBJECT = new Object();
         protected static final Set<Object> TEST_COLLECTION = Collections.singleton(TEST_OBJECT);
 
-        protected final Collection item;
+        protected final Collection<Object> item;
         protected final Description mismatchDescription;
         
-        public CollectionMethodChecker(Collection item, Description mismatchDescription) {
+        public CollectionMethodChecker(Collection<Object> item, Description mismatchDescription) {
             this.item = item;
             this.mismatchDescription = mismatchDescription;
         }
@@ -202,7 +200,7 @@ public class IsUnmodifiable {
             return true;
         }
         
-        private boolean checkMethod_add(Collection item, Object testObject, Description mismatchDescription) {
+        private boolean checkMethod_add(Collection<Object> item, Object testObject, Description mismatchDescription) {
             try {
                 item.add(testObject);
                 mismatchDescription.appendText("was able to add a value into the collection");
@@ -212,7 +210,7 @@ public class IsUnmodifiable {
             return false;
         }
     
-        private boolean checkMethod_add_all(Collection item, Set<Object> singletonList, Description mismatchDescription) {
+        private boolean checkMethod_add_all(Collection<Object> item, Set<Object> singletonList, Description mismatchDescription) {
             try {
                 item.addAll(singletonList);
                 mismatchDescription.appendText("was able to perform addAll on the collection");
@@ -222,10 +220,9 @@ public class IsUnmodifiable {
             return false;
         }
     
-        private boolean checkMethod_iterator(Collection item, Description mismatchDescription) {
+        private boolean checkMethod_iterator(Collection<Object> item, Description mismatchDescription) {
             try {
-                Iterator iterator = item.iterator();
-                iterator.remove();
+                item.iterator().remove();
                 mismatchDescription.appendText("was able to remove an element from the iterator");
                 return true;
             } catch (Exception ignore) {
@@ -233,7 +230,7 @@ public class IsUnmodifiable {
             return false;
         }
     
-        private boolean checkMethod_clear(Collection item, Description mismatchDescription) {
+        private boolean checkMethod_clear(Collection<Object> item, Description mismatchDescription) {
             try {
                 item.clear();
                 mismatchDescription.appendText("was able to clear the collection");
@@ -243,7 +240,7 @@ public class IsUnmodifiable {
             return false;
         }
     
-        private boolean checkMethod_retail_all(Collection item, Set<Object> singletonList, Description mismatchDescription) {
+        private boolean checkMethod_retail_all(Collection<Object> item, Set<Object> singletonList, Description mismatchDescription) {
             try {
                 item.retainAll(singletonList);
                 mismatchDescription.appendText("was able to call retainAll on the collection");
@@ -253,7 +250,7 @@ public class IsUnmodifiable {
             return false;
         }
     
-        private boolean checkMethod_remove_all(Collection item, Set<Object> singletonList, Description mismatchDescription) {
+        private boolean checkMethod_remove_all(Collection<Object> item, Set<Object> singletonList, Description mismatchDescription) {
             try {
                 item.removeAll(singletonList);
                 mismatchDescription.appendText("was able to call removeAll on the collection");
@@ -263,7 +260,7 @@ public class IsUnmodifiable {
             return false;
         }
     
-        private boolean checkMethod_remove(Collection item, Object testObject, Description mismatchDescription) {
+        private boolean checkMethod_remove(Collection<Object> item, Object testObject, Description mismatchDescription) {
             try {
                 item.remove(testObject);
                 mismatchDescription.appendText("was able to call remove a value from the collection");
@@ -275,11 +272,11 @@ public class IsUnmodifiable {
     }
 
     private static class ListMethodChecker extends CollectionMethodChecker {
-        protected final List list;
+        protected final List<Object> list;
 
-        public ListMethodChecker(Collection item, Description mismatchDescription) {
+        public ListMethodChecker(Collection<Object> item, Description mismatchDescription) {
             super(item, mismatchDescription);
-            if (item instanceof List originalList) {
+            if (item instanceof List<Object> originalList) {
                 this.list = originalList;
             } else {
                 throw new IllegalArgumentException("collection provided is not a list.");
@@ -302,7 +299,7 @@ public class IsUnmodifiable {
             return super.checkMethods();
         }
         
-        private boolean checkMethod_remove_index(List item, Description mismatchDescription) {
+        private boolean checkMethod_remove_index(List<Object> item, Description mismatchDescription) {
             try {
                 item.remove(0);
                 mismatchDescription.appendText("was able to call remove by index from the collection");
@@ -312,7 +309,7 @@ public class IsUnmodifiable {
             return false;
         }
     
-        private boolean checkMethod_add_all_index(List item, Set<Object> singletonList, Description mismatchDescription) {
+        private boolean checkMethod_add_all_index(List<Object> item, Set<Object> singletonList, Description mismatchDescription) {
             try {
                 item.addAll(0, singletonList);
                 mismatchDescription.appendText("was able to perform addAll by index on the collection");
@@ -322,7 +319,7 @@ public class IsUnmodifiable {
             return false;
         }
     
-        private boolean checkMethod_add_index(List item, Object testObject, Description mismatchDescription) {
+        private boolean checkMethod_add_index(List<Object> item, Object testObject, Description mismatchDescription) {
             try {
                 item.add(0, testObject);
                 mismatchDescription.appendText("was able to add a value into the list by index");
@@ -332,11 +329,9 @@ public class IsUnmodifiable {
             return false;
         }
     
-        private boolean checkMethod_listIterator_remove(List item, Description mismatchDescription) {
-            List list = item;
+        private boolean checkMethod_listIterator_remove(List<Object> item, Description mismatchDescription) {
             try {
-                ListIterator iterator = list.listIterator();
-                iterator.remove();
+                item.listIterator().remove();
                 mismatchDescription.appendText("was able to remove an element from the list iterator");
                 return true;
             } catch (Exception ignore) {
@@ -344,10 +339,9 @@ public class IsUnmodifiable {
             return false;
         }
     
-        private boolean checkMethod_listIterator_set(List item, Object testObject, Description mismatchDescription) {
-            List list = item;
+        private boolean checkMethod_listIterator_set(List<Object> item, Object testObject, Description mismatchDescription) {
             try {
-                ListIterator iterator = list.listIterator();
+                ListIterator<Object> iterator = item.listIterator();
                 iterator.next();
                 iterator.set(testObject);
                 mismatchDescription.appendText("was able to set element on the list iterator");
@@ -357,10 +351,9 @@ public class IsUnmodifiable {
             return false;
         }
     
-        private boolean checkMethod_listIterator_add(List item, Object testObject, Description mismatchDescription) {
-            List list = item;
+        private boolean checkMethod_listIterator_add(List<Object> item, Object testObject, Description mismatchDescription) {
             try {
-                ListIterator iterator = list.listIterator();
+                ListIterator<Object> iterator = item.listIterator();
                 iterator.next();
                 iterator.add(testObject);
                 mismatchDescription.appendText("was able to add element on the list iterator");
@@ -370,10 +363,9 @@ public class IsUnmodifiable {
             return false;
         }
     
-        private boolean checkMethod_listIterator_index(List item, Description mismatchDescription) {
-            List list = item;
+        private boolean checkMethod_listIterator_index(List<Object> item, Description mismatchDescription) {
             try {
-                Iterator iterator = list.listIterator(0);
+                Iterator<Object> iterator = item.listIterator(0);
                 iterator.remove();
                 mismatchDescription.appendText("was able to remove an element from the list iterator with index");
                 return true;
@@ -382,7 +374,7 @@ public class IsUnmodifiable {
             return false;
         }
     
-        private boolean checkMethod_set(List list, Description mismatchDescription) {
+        private boolean checkMethod_set(List<Object> list, Description mismatchDescription) {
             if (list.size() > 0) {
                 try {
                     list.set(0, list.get(0));
@@ -396,6 +388,7 @@ public class IsUnmodifiable {
     }
     
     private static class IsUnmodifiableCustomCollection<E> extends TypeSafeDiagnosingMatcher<Collection<? extends E>> {
+        @SuppressWarnings("rawtypes")
         private static final Map<Class<? extends Collection>, Object> DEFAULT_COLLECTIONS = new HashMap<>();
         static {
             final List<String> list = Arrays.asList("a", "b", "c");
@@ -406,14 +399,15 @@ public class IsUnmodifiable {
 
 
         @Override
-        protected boolean matchesSafely(final Collection collection, final Description mismatchDescription) {
+        protected boolean matchesSafely(final Collection<? extends E> collection, final Description mismatchDescription) {
+            @SuppressWarnings("rawtypes")
             final Class<? extends Collection> collectionClass = collection.getClass();
-            final Collection item = getInstanceOfType(collectionClass, collection);
+            final Collection<Object> item = getInstanceOfType(collectionClass, collection);
             if (item == null) {
                 throw failedToInstantiateItem(collectionClass, null);
             }
 
-            MethodChecker methodChecker = collection instanceof List listCollection ? new ListMethodChecker(item, mismatchDescription) : new CollectionMethodChecker(item, mismatchDescription);
+            MethodChecker methodChecker = item instanceof List<?> ? new ListMethodChecker(item, mismatchDescription) : new CollectionMethodChecker(item, mismatchDescription);
            
             return methodChecker.checkMethods();
         }
@@ -421,7 +415,7 @@ public class IsUnmodifiable {
     
     
         @SuppressWarnings("unchecked")
-        private <T> T getInstanceOfType(final Class clazz, Collection collection) {
+        private <T> T getInstanceOfType(final Class<?> clazz, @SuppressWarnings("rawtypes") Collection collection) {
             if (clazz.isArray()) {
                 return (T) Array.newInstance(clazz, 0);
             }
