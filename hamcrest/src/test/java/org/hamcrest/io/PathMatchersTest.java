@@ -23,13 +23,16 @@ public class PathMatchersTest extends AbstractMatcherTest {
     @TempDir Path tempDir;
     private Path directory;
     private Path file;
+    private Path anotherFile;
     private Path symbolicLink;
 
     @BeforeEach
     protected void setUp() throws IOException {
         directory = Files.createDirectory(tempDir.resolve("myDir"));
         file = directory.resolve("myFile");
+        anotherFile = directory.resolve("myAnotherFile");
         Files.createFile(file);
+        Files.writeString(anotherFile, "world");
         Files.createFile(directory.resolve("mydirFile")); // Makes sure myDir is not empty.
         if (!OS.WINDOWS.isCurrentOs()) { // Can't do symbolic links on Windows unless admin privileges are available.
             symbolicLink = tempDir.resolve("mySymbolicLink");
@@ -193,7 +196,29 @@ public class PathMatchersTest extends AbstractMatcherTest {
 //      assertDoesNotMatch("doesn't match incorrect file system",PathMatchers.hasFileSystem(equalTo(Paths.get("foo").getFileSystem())), file);
     }
 
-    @Override
+    @Test
+    public void testFileContentMatcher() {
+        assertMatches("matches file content with a file", PathMatchers.matchesContentOf(file), file);
+        assertDoesNotMatch("content of two files with different content won't match", PathMatchers.matchesContentOf(anotherFile), file);
+    }
+
+    @Test
+    public void testFileContentMatcherDescription() {
+        assertMismatchDescription("content was \"\"", PathMatchers.matchesContentOf(anotherFile), file);
+    }
+
+    @Test
+    public void testAFileWithContent() {
+        assertMatches("matches file content", PathMatchers.hasContent(equalTo("")), file);
+        assertDoesNotMatch("doesn't match incorrect content", PathMatchers.hasContent(equalTo("world")), file);
+    }
+
+    @Test
+    public void testAFileWithContentDescription() {
+        assertMismatchDescription("content was \"\"", PathMatchers.hasContent(equalTo("world")), file);
+    }
+
+   @Override
     protected Matcher<?> createMatcher() {
         return PathMatchers.hasSizeEqualTo(1L);
 //        return PathMatchers.isSymbolicLink();

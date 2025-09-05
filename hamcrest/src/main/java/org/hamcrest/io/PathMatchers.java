@@ -9,6 +9,7 @@ import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.TypeSafeDiagnosingMatcher.matcher;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -207,6 +208,39 @@ public final class PathMatchers {
         };
     }
 
+    /**
+     * Matcher for matching file content with given file path
+     * 
+     * Note: line endings in the file are preserved in their platform dependent form, 
+     * so both files must contain the same line endings to match.
+     * 
+     * @param expected The file with the expected content
+     * @return A FeatureMatcher that takes the content of a file path as feature
+     */
+    public static Matcher<Path> matchesContentOf(Path expected) {
+        String expectedContent =  toUncheckedEx(()->Files.readString(expected));
+        return new FeatureMatcher<Path, String>(equalTo(expectedContent), "A file with content", "content") {
+            @Override protected String featureValueOf(Path actual) { return toUncheckedEx(()->Files.readString(actual));}
+        };
+    }
+
+    /**
+     * Matcher for matching file content with given String Matcher
+     * 
+     * Note: line endings in the file are converted to '\n' to avoid platform dependent test results
+     * 
+     * @param expected The expected content Matcher
+     * @return A FeatureMatcher that takes the content of a file as feature
+     */
+    public static Matcher<Path> hasContent(Matcher<String> expected) {
+        return new FeatureMatcher<Path, String>(expected, "A file with content", "content") {
+            @Override protected String featureValueOf(Path actual) {
+                // use collector to avoid platform dependent line endings
+                return toUncheckedEx(()->Files.lines(actual).collect(Collectors.joining("\n")));
+                }
+        };
+    }
+
     // Possible additions:
     // - hasParent(Matcher<Path>)
     // - hasRoot(Matcher<Path>)
@@ -221,7 +255,6 @@ public final class PathMatchers {
     // - hasFileAttribute(String, Matcher<Object>)
     // - hasProvider(Matcher<FileSystemProvider>)
 
-    // - hasContent(Matcher<String>)
     // - containsStrings(String...)
 
     // Workaround for JDK 8 not supporting Files.isHidden(Path) for directories
