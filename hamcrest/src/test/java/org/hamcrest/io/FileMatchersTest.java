@@ -2,14 +2,13 @@ package org.hamcrest.io;
 
 import org.hamcrest.test.AbstractMatcherTest;
 import org.hamcrest.Matcher;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.io.TempDir;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static org.hamcrest.test.MatcherAssertions.*;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -18,23 +17,21 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class FileMatchersTest extends AbstractMatcherTest {
 
+    @TempDir Path tempDir;
     private File directory;
     private File file;
     private File anotherFile;
 
     @BeforeEach
     protected void setUp() throws IOException {
-        directory = Files.createTempDirectory("myDir").toFile();
+        directory = Files.createDirectory(tempDir.resolve("myDir")).toFile();
         file = new File(directory, "myFile");
         file.createNewFile();
   
         anotherFile = new File(directory, "myAnotherFile");
-        anotherFile.createNewFile();
 
-        BufferedWriter anotherFileWriter = new BufferedWriter(new FileWriter(anotherFile));
-        anotherFileWriter.write(("world"));
-        anotherFileWriter.close();
-}
+        Files.writeString(anotherFile.toPath(), "world");
+    }
 
     @Test
     public void testAnExistingDirectory() {
