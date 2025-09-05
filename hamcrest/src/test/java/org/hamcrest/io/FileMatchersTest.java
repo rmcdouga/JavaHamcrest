@@ -102,26 +102,30 @@ public class FileMatchersTest extends AbstractMatcherTest {
         assertDoesNotMatch("doesn't match incorrect absolute path", FileMatchers.aFileWithAbsolutePath(equalTo("foo")), file);
     }
 
-    @Override
-    protected Matcher<?> createMatcher() {
-        return FileMatchers.aFileWithSize(1L);
-    }
-
+    @Test
     public void testFileContentMatcher() {
         assertMatches("matches file content with a file", FileMatchers.matchesContentOf(file), file);
         assertDoesNotMatch("content of two files with different content won't match", FileMatchers.matchesContentOf(anotherFile), file);
     }
 
+    @Test
     public void testFileContentMatcherDescription() {
         assertMismatchDescription("content was \"\"", FileMatchers.matchesContentOf(anotherFile), file);
     }
 
+    @Test
     public void testAFileWithContent() {
         assertMatches("matches file content", FileMatchers.aFileWithContent(equalTo("")), file);
         assertDoesNotMatch("doesn't match incorrect content", FileMatchers.aFileWithContent(equalTo("world")), file);
     }
 
+    @Test
     public void testAFileWithContentDescription() {
         assertMismatchDescription("content was \"\"", FileMatchers.aFileWithContent(equalTo("world")), file);
+    }
+
+    @Override
+    protected Matcher<?> createMatcher() {
+        return FileMatchers.aFileWithSize(1L);
     }
 }
