@@ -9,10 +9,20 @@ import java.lang.reflect.Constructor;
 import java.util.*;
 
 /**
- * Matches if collection is truly unmodifiable
+ * This class contains static factory methods for creating Matchers that test if a collection is unmodifiable.
+ * 
+ * <p>
+ * The main matcher is {@link #isUnmodifiableCollection()} which tries to determine if a collection is unmodifiable.
+ * Other matchers are provided to test specific cases, such as {@link #isUnmodifiableJdkCollection()}, 
+ * {@link #isModifiableJdkCollection()} and {@link #isUnmodifiableCustomCollection()}.
+ * </p>
+ * 
  */
 public class IsUnmodifiable {
 
+    // Prevent instantiation
+    private IsUnmodifiable() {
+    }
 
     /**
      * Creates matcher that matches when collection is unmodifiable.
