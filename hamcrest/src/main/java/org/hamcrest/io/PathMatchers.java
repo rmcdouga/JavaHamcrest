@@ -71,7 +71,7 @@ public final class PathMatchers {
     }
 
     /**
-     * A matcher that checks if a file/directory is executable.
+     * A matcher that checks if a file/directory is the same file.
      * @return the file matcher
      */
     public static Matcher<Path> isSameFile(Path target) {
@@ -87,7 +87,7 @@ public final class PathMatchers {
     }
 
     /**
-     * A matcher that checks if a file/directory is executable.
+     * A matcher that checks if a file/directory is hidden.
      * @return the file matcher
      */
     public static Matcher<Path> isHidden() {
@@ -127,7 +127,7 @@ public final class PathMatchers {
     }
 
     /**
-     * A matcher that checks if a file name matches an expected name.
+     * A matcher that checks if a file name matches an expected String.
      * @param expected the expected name
      * @return the file matcher
      */
@@ -149,7 +149,7 @@ public final class PathMatchers {
     }
 
     /**
-     * A matcher that checks if a file real path matches an expected path.
+     * A matcher that checks if a file real path matches an expected String.
      * @param expected the expected path
      * @return the file matcher
      */
@@ -185,9 +185,9 @@ public final class PathMatchers {
     }
 
     /**
-     * A matcher that checks if a file absolute path matches an expected path.
+     * A matcher that checks if a file absolute path matches an expected String.
      * 
-     * @param expected the expected path
+     * @param expected the expected path String
      * @return the file matcher
      */
     public static Matcher<Path> hasAbsolutePathString(final Matcher<String> expected) {
@@ -209,10 +209,12 @@ public final class PathMatchers {
     }
 
     /**
-     * Matcher for matching file content with given file path
+     * Matcher for matching file content with given file path.
      * 
-     * Note: line endings in the file are preserved in their platform dependent form, 
+     * <p>
+     * <i>Note:</i> line endings in the file are preserved in their platform dependent form, 
      * so both files must contain the same line endings to match.
+     * </p>
      * 
      * @param expected The file with the expected content
      * @return A FeatureMatcher that takes the content of a file path as feature
@@ -225,9 +227,11 @@ public final class PathMatchers {
     }
 
     /**
-     * Matcher for matching file content with given String Matcher
+     * Matcher for matching file content with given String Matcher.
      * 
-     * Note: line endings in the file are converted to '\n' to avoid platform dependent test results
+     * <p>
+     * <i>Note:</i> line endings in the file are converted to '\n' to avoid platform dependent test results
+     * </p>
      * 
      * @param expected The expected content Matcher
      * @return A FeatureMatcher that takes the content of a file as feature
