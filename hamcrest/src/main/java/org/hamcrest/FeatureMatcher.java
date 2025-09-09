@@ -70,17 +70,23 @@ private FeatureMatcher(Matcher<? super U> subMatcher, String featureDescription,
   }
 
   /**
-   * Create a matcher that matches a feature of an object.
+   * Create a {@code Matcher} that matches a feature of an object.
+   * 
+   * <p>
+   * Uses the {@code extractor} function to pull the feature from the object, and
+   * applies the {@code featureMatcher} to that feature.  The result of the {@code featureMatcher}
+   * call is returned as the result of the created {@code Matcher}.
+   * </p>
    *
-   * @param expected           the matcher for the expected feature value
-   * @param extractor          function to extract the feature from the object
-   * @param featureDescription descriptive text to use in describeTo
+   * @param featureMatcher     the {@code Matcher} for the expected feature value
+   * @param extractor          {@code Function} to extract the feature from the object
+   * @param featureDescription descriptive text to use in {@code describeTo}
    * @param featureName        identifying text for mismatch message
    * @param expectedType       expected type to match against
-   * @return a matcher that matches the feature of the object
+   * @return a {@code Matcher} that matches against the feature of the object
    */
-  public static <T, F> Matcher<T> matcher(final Matcher<F> expected, final Function<T, F> extractor, String featureDescription, String featureName, Class<T> expectedType) {
-      return new FeatureMatcher<T, F>(expected, featureDescription, featureName, expectedType) {
+  public static <T, F> Matcher<T> matcher(final Matcher<F> featureMatcher, final Function<T, F> extractor, String featureDescription, String featureName, Class<T> expectedType) {
+      return new FeatureMatcher<T, F>(featureMatcher, featureDescription, featureName, expectedType) {
           @Override protected F featureValueOf(T actual) { return extractor.apply(actual); }
       };
   }
