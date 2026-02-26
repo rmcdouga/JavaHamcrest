@@ -86,7 +86,7 @@ def pomConfigurationFor(String pomName, String pomDescription) {
     return {
         name = pomName
         description = pomDescription
-        url = 'http://hamcrest.org/JavaHamcrest/'
+        url = 'https://hamcrest.org/JavaHamcrest/'
 
         scm {
             connection = 'scm:git:https://github.com/hamcrest/JavaHamcrest.git'
